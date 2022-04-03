@@ -1,12 +1,9 @@
-#import Drop_api
 from http.client import HTTPException
-from fastapi import FastAPI, HTTPException
+from fastapi import APIRouter, HTTPException
 from typing import List, Optional
 from pydantic import BaseModel
-import sqlite3 
 
-
-app = FastAPI()
+app = APIRouter()
 
 class Croisement(BaseModel):
     id_croisement : str 

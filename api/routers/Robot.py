@@ -1,11 +1,9 @@
-#import Drop_api
 from http.client import HTTPException
-from fastapi import FastAPI, HTTPException
+from fastapi import APIRouter, HTTPException
 from typing import List, Optional
 from pydantic import BaseModel
-import sqlite3 
 
-app = FastAPI()
+app = APIRouter()
 
 class Robot(BaseModel):
     id_robot : str
@@ -18,12 +16,12 @@ Robots = [
 
 #creation de la lecture ecriture mise à jour et suppression d'elements:
 #liste des robots
-@app.get("/robots/",tags = ['Croisement'],response_model=List[Robot]) 
+@app.get("/robots/",tags = ['Robot'],response_model=List[Robot]) 
 async def get_robots():
     return Robots
 
 #Reccupere le robot avec son id d'identification
-@app.get("/robot/{id}",tags = ['Croisement'])
+@app.get("/robot/{id}",tags = ['Robot'])
 async def get_robot(id:int):
     try : 
         return Robots[id]
@@ -31,13 +29,13 @@ async def get_robot(id:int):
         raise HTTPException(status_code=404, detail="Object not found in DataBase")
     
 #ajoute un robot
-@app.post("/robot/",tags = ['Croisement'])
+@app.post("/robot/",tags = ['Robot'])
 async def create_robot(robot: Robot):
     Robots.append(robot)
     return robot
 
 #mise a jour du robot
-@app.put("/robot/{id}",tags = ['Croisement'])
+@app.put("/robot/{id}",tags = ['Robot'])
 async def update_robot(id : int , new_robot : Robot):
     try:
         Robots[id] = new_robot
@@ -47,7 +45,7 @@ async def update_robot(id : int , new_robot : Robot):
         raise HTTPException(status_code=404, detail="Object not found in DataBase")
 
 #supprime le robot  
-@app.delete("/robot/{id}",tags = ['Croisement'])
+@app.delete("/robot/{id}",tags = ['Robot'])
 async def delete_robot(id : int):
     try:
         objRobot =Robots[id]
