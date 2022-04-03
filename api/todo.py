@@ -4,6 +4,9 @@ from fastapi import FastAPI, HTTPException
 from typing import List, Optional
 from pydantic import BaseModel
 
+#pour une execution sans redemarage de fastapi :
+#uvicorn todo:app --reload
+
 
 app = FastAPI(title="Todo Api", version="v1")
 

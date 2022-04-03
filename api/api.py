@@ -1,7 +1,7 @@
 #link sources : 
 # https://www.youtube.com/watch?v=7D_0JTeaKWg
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Form
 
 #import pour lancer fastapi sans passer par le terminal 
 import uvicorn
@@ -55,6 +55,11 @@ async def get_component(component_id: int):
 async def read_component(number: int, text:Optional[str]):
     return {"number":number , "text": text}
 #instruction a lancer pour tester : http://127.0.0.1:8000/component/?number=12&text=component%20name
+
+@app.post("/login/")
+async def login(username: str = Form(...), password: str= Form(...) ):
+    return {username : username}
+
 
 # pour une execuction direct faire une fonction direct 
 # fonction auto-documenter (plus facile a utiliser) : http://127.0.0.1:8000/docs
