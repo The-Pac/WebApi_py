@@ -4,7 +4,7 @@
 from fastapi import FastAPI, Form
 
 #import pour lancer fastapi sans passer par le terminal 
-import uvicorn
+#import uvicorn
 
 from typing import Optional
 from pydantic import BaseModel
@@ -63,7 +63,7 @@ async def login(username: str = Form(...), password: str= Form(...) ):
 
 # pour une execuction direct faire une fonction direct 
 # fonction auto-documenter (plus facile a utiliser) : http://127.0.0.1:8000/docs
-if __name__ == "_main_":
-    uvicorn.run(app, host="127.0.0.1", port =8000)
+#if __name__ == "_main_":
+#    uvicorn.run(app, host="127.0.0.1", port =8000)
 
 

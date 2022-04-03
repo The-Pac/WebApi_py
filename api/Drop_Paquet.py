@@ -1,27 +1,29 @@
-import Drop_api
+#import Drop_api
 from http.client import HTTPException
 from fastapi import FastAPI, HTTPException
 from typing import List, Optional
 from pydantic import BaseModel
 import sqlite3 
-import datetime
+#import datetime
+
+app = FastAPI()
 
 class Paquet(BaseModel):
     id_paquet : str
     addr : str
     statut_paquet : str
-    date_arr : datetime.datetime.now().strftime("%Y%M%D %Hh:%Mm:%Ss")
+    date_arr : str#Optional[str] = None
 
 Paquets = []
 
 #creation de la lecture ecriture mise à jour et suppression d'elements:
 #liste des paquets
-@Drop_api.appDrop.get("/paquets/",response_model=List[Paquets]) 
+@app.get("/paquets/",response_model=List[Paquet]) 
 async def get_paquets():
     return Paquets
 
 #Reccupere le paquet avec son id d'identification
-@Drop_api.appDrop.get("/paquet/{id}")
+@app.get("/paquet/{id}")
 async def get_paquet(id:int):
     try : 
         return Paquets[id]
@@ -29,13 +31,17 @@ async def get_paquet(id:int):
         raise HTTPException(status_code=404, detail="Object not found in DataBase")
     
 #ajoute un paquet
-@Drop_api.appDrop.post("/paquet/")
+@app.post("/paquet/" )
 async def create_paquet(paquet: Paquet):
-    Paquets.append(paquet)
-    return paquet
+    try:
+        #paquet.date_arr = str(datetime.datetime.now().strftime("%Y%m%d %H:%M:%S")) 
+        Paquets.append(paquet)
+        return paquet
+    except:
+            raise HTTPException(status_code=404, detail="Object not found in DataBase")
 
 #mise a jour du paquet
-@Drop_api.appDrop.put("/paquet/{id}")
+@app.put("/paquet/{id}")
 async def update_paquet(id : int , new_paquet : Paquet):
     try:
         Paquets[id] = new_paquet
@@ -45,7 +51,7 @@ async def update_paquet(id : int , new_paquet : Paquet):
         raise HTTPException(status_code=404, detail="Object not found in DataBase")
 
 #supprime le paquet  
-@Drop_api.appDrop.delete("/paquet/{id}")
+@app.delete("/paquet/{id}")
 async def delete_paquet(id : int):
     try:
         objPaquet =Paquets[id]

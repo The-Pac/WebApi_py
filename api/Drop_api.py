@@ -7,6 +7,7 @@ import Drop_Maison
 import Drop_Paquet
 import Drop_Robot
 
+
 import sqlite3 
 import datetime
 from http.client import HTTPException
@@ -22,6 +23,6 @@ from pydantic import BaseModel
 appDrop = FastAPI(title="API DROP", version="v1")
 
 @appDrop.get("/")
-async def Paquets(ident : str, addr : str, date_arr : datetime.datetime.now().strftime("%Y%M%D %Hh:%Mm:%Ss")):
-    return {"identifiant" : ident, "adresse" : addr, "date_arriver" : date_arr}
+async def home():
+    return {"hello" : "world"}
 

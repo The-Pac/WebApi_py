@@ -1,6 +1,6 @@
 import Drop_Paquet
 import Drop_Robot
-import Drop_api
+#import Drop_api
 from http.client import HTTPException
 from fastapi import FastAPI, HTTPException
 from typing import List, Optional
@@ -8,25 +8,27 @@ from pydantic import BaseModel
 import sqlite3 
 import datetime
 
+app = FastAPI()
+
 class Livraison(BaseModel):
     id_livraison : str
     paquet : Drop_Paquet.id_paquet
     statut_livraison : str
     robot : Drop_Robot.id_robot
-    dateheure : datetime.datetime.now().strftime("%Y%M%D %Hh:%Mm:%Ss")
+    dateheure : str(datetime.datetime.now().strftime("%Y%M%D %Hh:%Mm:%Ss"))
 
 Livraisons = [
 
 ]
 
 #creation de la lecture ecriture mise à jour et suppression d'elements:
-#liste des livraison
-@Drop_api.appDrop.get("/livraisons/",response_model=List[Livraison]) 
+#liste des livraisons
+@app.get("/livraisons/",response_model=List[Livraison]) 
 async def get_livraisons():
     return Livraisons
 
 #Reccupere la livraison avec son id d'identification
-@Drop_api.appDrop.get("/livraison/{id}")
+@app.get("/livraison/{id}")
 async def get_livraison(id:int):
     try : 
         return Livraisons[id]
@@ -34,13 +36,13 @@ async def get_livraison(id:int):
         raise HTTPException(status_code=404, detail="Object not found in DataBase")
     
 #ajoute une livraison
-@Drop_api.appDrop.post("/livraison/")
+@app.post("/livraison/")
 async def create_livraison(livraison: Livraison):
     Livraisons.append(livraison)
     return livraison
 
 #mise a jour de la livraison
-@Drop_api.appDrop.put("/livraison/{id}")
+@app.put("/livraison/{id}")
 async def update_livraison(id : int , new_livraison : Livraison):
     try:
         Livraisons[id] = new_livraison
@@ -50,7 +52,7 @@ async def update_livraison(id : int , new_livraison : Livraison):
         raise HTTPException(status_code=404, detail="Object not found in DataBase")
 
 #supprime la livraison  
-@Drop_api.appDrop.delete("/livraison/{id}")
+@app.delete("/livraison/{id}")
 async def delete_livraison(id : int):
     try:
         objLivraison =Livraisons[id]
