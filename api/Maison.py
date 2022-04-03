@@ -1,6 +1,7 @@
-import Drop_Croisement
+
 #import Drop_api
 from http.client import HTTPException
+from sys import prefix
 from fastapi import FastAPI, HTTPException
 from typing import List, Optional
 from pydantic import BaseModel
@@ -10,7 +11,7 @@ app = FastAPI()
 
 class Maison(BaseModel):
     id_maison : str
-    croisement : Drop_Croisement.Croisement.id_croisement
+    croisement : str 
     emplacement : int
 
 Maisons = [
@@ -19,12 +20,12 @@ Maisons = [
 
 #creation de la lecture ecriture mise à jour et suppression d'elements:
 #liste des maisons
-@app.get("/maisons/",response_model=List[Maison]) 
+@app.get("/maisons/",tags = ['Maison'],response_model=List[Maison]) 
 async def get_maisons():
     return Maisons
 
 #Reccupere la maison avec son id d'identification
-@app.get("/maison/{id}")
+@app.get("/maison/{id}",tags = ['Maison'])
 async def get_maison(id:int):
     try : 
         return Maisons[id]
@@ -32,13 +33,13 @@ async def get_maison(id:int):
         raise HTTPException(status_code=404, detail="Object not found in DataBase")
     
 #ajoute une maison
-@app.post("/maison/")
+@app.post("/maison/",tags = ['Maison'])
 async def create_maison(maison: Maison):
     Maisons.append(maison)
     return maison
 
 #mise a jour de la maison
-@app.put("/maison/{id}")
+@app.put("/maison/{id}",tags = ['Maison'])
 async def update_maison(id : int , new_maison : Maison):
     try:
         Maisons[id] = new_maison
@@ -48,7 +49,7 @@ async def update_maison(id : int , new_maison : Maison):
         raise HTTPException(status_code=404, detail="Object not found in DataBase")
 
 #supprime la maison  
-@app.delete("/maison/{id}")
+@app.delete("/maison/{id}",tags = ['Maison'])
 async def delete_maison(id : int):
     try:
         objMaison =Maisons[id]

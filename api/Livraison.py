@@ -1,6 +1,4 @@
-import Drop_Paquet
-import Drop_Robot
-#import Drop_api
+
 from http.client import HTTPException
 from fastapi import FastAPI, HTTPException
 from typing import List, Optional
@@ -12,10 +10,10 @@ app = FastAPI()
 
 class Livraison(BaseModel):
     id_livraison : str
-    paquet : Drop_Paquet.id_paquet
+    paquet : str
     statut_livraison : str
-    robot : Drop_Robot.id_robot
-    dateheure : str(datetime.datetime.now().strftime("%Y%M%D %Hh:%Mm:%Ss"))
+    robot : str
+    dateheure : str
 
 Livraisons = [
 
@@ -23,12 +21,12 @@ Livraisons = [
 
 #creation de la lecture ecriture mise à jour et suppression d'elements:
 #liste des livraisons
-@app.get("/livraisons/",response_model=List[Livraison]) 
+@app.get("/livraisons/",tags = ['Croisement'],response_model=List[Livraison]) 
 async def get_livraisons():
     return Livraisons
 
 #Reccupere la livraison avec son id d'identification
-@app.get("/livraison/{id}")
+@app.get("/livraison/{id}",tags = ['Croisement'])
 async def get_livraison(id:int):
     try : 
         return Livraisons[id]
@@ -36,13 +34,13 @@ async def get_livraison(id:int):
         raise HTTPException(status_code=404, detail="Object not found in DataBase")
     
 #ajoute une livraison
-@app.post("/livraison/")
+@app.post("/livraison/",tags = ['Croisement'])
 async def create_livraison(livraison: Livraison):
     Livraisons.append(livraison)
     return livraison
 
 #mise a jour de la livraison
-@app.put("/livraison/{id}")
+@app.put("/livraison/{id}",tags = ['Croisement'])
 async def update_livraison(id : int , new_livraison : Livraison):
     try:
         Livraisons[id] = new_livraison
@@ -52,7 +50,7 @@ async def update_livraison(id : int , new_livraison : Livraison):
         raise HTTPException(status_code=404, detail="Object not found in DataBase")
 
 #supprime la livraison  
-@app.delete("/livraison/{id}")
+@app.delete("/livraison/{id}",tags = ['Croisement'])
 async def delete_livraison(id : int):
     try:
         objLivraison =Livraisons[id]

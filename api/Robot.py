@@ -18,12 +18,12 @@ Robots = [
 
 #creation de la lecture ecriture mise à jour et suppression d'elements:
 #liste des robots
-@app.get("/robots/",response_model=List[Robot]) 
+@app.get("/robots/",tags = ['Croisement'],response_model=List[Robot]) 
 async def get_robots():
     return Robots
 
 #Reccupere le robot avec son id d'identification
-@app.get("/robot/{id}")
+@app.get("/robot/{id}",tags = ['Croisement'])
 async def get_robot(id:int):
     try : 
         return Robots[id]
@@ -31,13 +31,13 @@ async def get_robot(id:int):
         raise HTTPException(status_code=404, detail="Object not found in DataBase")
     
 #ajoute un robot
-@app.post("/robot/")
+@app.post("/robot/",tags = ['Croisement'])
 async def create_robot(robot: Robot):
     Robots.append(robot)
     return robot
 
 #mise a jour du robot
-@app.put("/robot/{id}")
+@app.put("/robot/{id}",tags = ['Croisement'])
 async def update_robot(id : int , new_robot : Robot):
     try:
         Robots[id] = new_robot
@@ -47,7 +47,7 @@ async def update_robot(id : int , new_robot : Robot):
         raise HTTPException(status_code=404, detail="Object not found in DataBase")
 
 #supprime le robot  
-@app.delete("/robot/{id}")
+@app.delete("/robot/{id}",tags = ['Croisement'])
 async def delete_robot(id : int):
     try:
         objRobot =Robots[id]
