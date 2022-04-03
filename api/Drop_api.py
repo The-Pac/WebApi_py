@@ -20,8 +20,8 @@ appDrop.include_router(Livraison.app)
 appDrop.include_router(Maison.app)
 appDrop.include_router(Paquet.app)
 appDrop.include_router(Robot.app)
-
+'''
 @appDrop.get("/")
 async def home():
     return {"hello" : "world"}
-
+'''

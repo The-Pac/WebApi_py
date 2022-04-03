@@ -2,14 +2,16 @@ from http.client import HTTPException
 from fastapi import APIRouter, HTTPException
 from typing import List, Optional
 from pydantic import BaseModel
+#import datetime
 
 app = APIRouter()
+#date_Actual = str(datetime.datetime.now().strftime("%Y%m%d %H:%M:%S")) 
 
 class Paquet(BaseModel):
     id_paquet : str
     addr : str
     statut_paquet : str
-    date_arr : str
+    date_arr : str#date_Actual
 
 Paquets = []
 
