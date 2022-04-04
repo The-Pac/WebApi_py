@@ -43,7 +43,7 @@ const char *password = "kohWoong5oox";
 String demande_client;
 
 //Your Domain name with URL path or IP address with path
-String serverName = "http://127.0.0.1:8000";
+String serverName = "http://10.3.3.131:8000";
 
 // the following variables are unsigned longs because the time, measured in
 // milliseconds, will quickly become a bigger number than can be stored in an int.
