@@ -2,9 +2,8 @@
 import sqlite3
 from sqlite3 import Error
 from pathlib import Path
-import DB_Paquet
 
-databaseName = "Livraison.db"
+databaseName = "Paquet.db"
 
 #Creation de la Table
 def createBase():
@@ -14,16 +13,14 @@ def createBase():
         return False
     
     c = conn.cursor()
-    c.execute('''CREATE TABLE LIVRAISONS (
-                        id_Livraison    INTERGER PRIMARY KEY,,
-                        id_paquet       INTERGER,
-                        statut          TEXT,
-                        robot           text,
-                        dateheure       text
-                        FOREIGN KEY(id_paquet) REFERENCES PAQUETS(id_paquet))''')
+    c.execute('''CREATE TABLE PAQUETS (
+                        id_paquet       INTERGER PRIMARY KEY,
+                        destination     TEXT,
+                        arrivée         TEXT 
+                        )''')
     conn.commit()
     return conn
-
+    
 #Connection a la base de donnee
 def connectBase():
     try:

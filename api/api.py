@@ -40,8 +40,8 @@ async def make_position(essai : Essai1):
     #db completer 
     return essai #{ "new_coord" : essai.dict()}
 
-#pour l'execution instalation save et entrer uvicorn api:app --reload dans un termiinal puis reccuerer 
-# l'adresse du serveur (dans le resultat retouner) une adresse type : "http://127.0.0.1:8000"
+#pour l'execution instalation save et entrer uvicorn api:app --reload dans un terminal puis reccuperer 
+# l'adresse du serveur (dans le resultat retouner) une adresse type : "http://127.0.0.1:8000/docs"
 # et la lancer dans une page internet 
 
 #lors d'une utilisation parametrer penser a réinitialiser fastapi en entrant dans un terminal "python3 api.py"
