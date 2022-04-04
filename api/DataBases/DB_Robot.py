@@ -2,6 +2,7 @@
 import sqlite3
 from sqlite3 import Error
 from pathlib import Path
+
 databaseName = "Robot.db"
 
 #Creation de la Table
@@ -12,12 +13,13 @@ def createBase():
         return False
     
     c = conn.cursor()
-    c.execute('''CREATE TABLE ROBOT (
+    c.execute('''CREATE TABLE ROBOTS (
                         id_robot  text,
                         nom       text,
                         statut    text )
                         ''')
     conn.commit()
+    print ("Table created successfully");
     return conn
 
 #Connection a la base de donnee
@@ -29,6 +31,7 @@ def connectBase():
             conn = sqlite3.connect(databaseName)
             return conn
         conn = createBase()
+        print ("Connected successfully");
         return conn
     except:
         return False
