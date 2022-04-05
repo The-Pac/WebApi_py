@@ -6,7 +6,7 @@ from pydantic import BaseModel
 app = APIRouter()
 
 class Robot(BaseModel):
-    id_robot : str
+    id_robot : int
     nom_robot : str
     statut_robot : bool
 
