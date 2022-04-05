@@ -72,18 +72,18 @@ void DGauche(){
 }
 
 void DAvant(){
-  digitalWrite(D1, LOW);
+  digitalWrite(D1, HIGH);
   digitalWrite(D2, LOW);
   digitalWrite(D3, HIGH);
-  digitalWrite(D4, HIGH);
+  digitalWrite(D4, LOW);
   
 }
 
 void DArriere(){
-  digitalWrite(D1, HIGH);
+  digitalWrite(D1, LOW);
   digitalWrite(D2, HIGH);
   digitalWrite(D3, LOW);
-  digitalWrite(D4, LOW);
+  digitalWrite(D4, HIGH);
   
 }
 //######################################
@@ -132,26 +132,8 @@ void loop()
     int etat = 0;
    while (1)
       {
-        
-        // AVANCER
-        if ((digitalRead(C2) == 0 || digitalRead(C3) == 0 ) && digitalRead(C1) == 1 && digitalRead(C4) == 1){
-          DAvant();
-        }
-
-        // CORRECTION DE LIGNE
-        if ((digitalRead(C2) == 0 || digitalRead(C3) == 0 ) && digitalRead(C1) == 1 && digitalRead(C4) == 0){
-          DDroit();
-        }
-        if ((digitalRead(C2) == 0 || digitalRead(C3) == 0 ) && digitalRead(C1) == 0 && digitalRead(C4) == 1){
-          DGauche();
-        }
-        if (digitalRead(C2) == 0 && digitalRead(C3) == 0  && digitalRead(C1) == 0 && digitalRead(C4) == 0){
-          DArriere();
-        }
-
-
         //Croisement
-        if (digitalRead(C2) == 1 && digitalRead(C3) == 1  && (digitalRead(C1) == 1 || digitalRead(C4) == 1)){
+        if (digitalRead(C2) == 1 && digitalRead(C3) == 1  &&( digitalRead(C1) == 1 || digitalRead(C4) == 1)){
 
           ///////COHORDONNES
           // arriver 
@@ -159,31 +141,80 @@ void loop()
           int arr2 = arr - arr1;
           
           // position actuelle
-          int posi1 = (posi)*10;
+          int posi1 = (posi / 10)*10;
           int posi2 = posi - posi1;
+          
+          Serial.print("arrivé  ");
+          Serial.println(arr);
+          
+          Serial.print("position  ");
+          Serial.println(posi);
 
           //DEPLACEMENT JUSQUA ARRIVE
 
           if(posi1 != arr1){
+            Serial.print("arrivé1  ");
+            Serial.println(arr1);
+            
+            Serial.print("position1  ");
+            Serial.println(posi1);
             if (posi1 < arr1){
               DAvant();
               posi = posi + 10;
+              Serial.println("c avant");
+              delay(1000);
               
             }
             else if (posi1 > arr1) {
               DArriere();
               posi = posi - 10;
+              Serial.println("c arriere");
+              delay(1000);
             }
             
           }
           else if(posi2 != arr2){
+            Serial.print("arrivé2  ");
+            Serial.println(arr2);
+            
+            Serial.print("position2  ");
+            Serial.println(posi2);
+
+            while (digitalRead(C1) == 1 && digitalRead(C4) == 1){
+              DAvant();
+            }
+            DStop();
             if (posi2 < arr2){
               DGauche();
               posi = posi + 1;
+              Serial.println("c gauche");
+              delay(1000);
+
+              while (digitalRead(C1) == 1 && digitalRead(C4) == 1){
+                DAvant();
+              }
+              DStop();
+            
+              while (digitalRead(C2) == 1 && digitalRead(C3) == 1){
+                DGauche();
+              }
+              DStop();
             }
             else if (posi2 > arr2) {
               DDroit();
               posi = posi - 1;
+              Serial.println("c droit");
+              delay(1000);
+
+              while (digitalRead(C1) == 1 && digitalRead(C4) == 1){
+                DAvant();
+              }
+              DStop();
+            
+              while (digitalRead(C2) == 1 && digitalRead(C3) == 1){
+                DDroit();
+              }
+              DStop();
             }
             
           }
@@ -197,6 +228,25 @@ void loop()
 
           
         }
+        
+        // AVANCER
+        else if ((digitalRead(C2) == 1 || digitalRead(C3) == 1 ) && digitalRead(C1) == 0 && digitalRead(C4) == 0){
+          DAvant();
+          Serial.println("d avant");
+        }
+
+        // CORRECTION DE LIGNE
+        else if ( digitalRead(C1) == 0 && digitalRead(C4) == 1){
+          DDroit();
+          Serial.println("d droit");
+        }
+        else if ( digitalRead(C1) == 1 && digitalRead(C4) == 0){
+          DGauche();
+          Serial.println("d gauche");
+        }
+
+
+        
          
 
         

@@ -43,7 +43,7 @@ const char *password = "kohWoong5oox";
 String demande_client;
 
 //Your Domain name with URL path or IP address with path
-String serverName = "http://10.3.3.131:8000";
+String serverName = "http://10.3.1.235:8000";
 
 // the following variables are unsigned longs because the time, measured in
 // milliseconds, will quickly become a bigger number than can be stored in an int.
@@ -118,7 +118,7 @@ void loop()
     //Check WiFi connection status
     if(WiFi.status()== WL_CONNECTED){
       HTTPClient http;
-      String serverPath = serverName + "/paquets/";
+      String serverPath = serverName + "/croisements/";
 
       // Your Domain name with URL path or IP address with path
       http.begin(serverPath.c_str());
