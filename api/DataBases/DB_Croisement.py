@@ -14,11 +14,12 @@ def createBase():
     
     c = conn.cursor()
     c.execute('''CREATE TABLE CROISEMENTS (
-                        id_Croisement  text,
-                        x       interger,
-                        y       interger )
-                        ''')
+                        id_Croisement  INTEGER PRIMARY KEY AUTOINCREMENT,
+                        x       INTERGER,
+                        y       INTERGER 
+                        )''')
     conn.commit()
+    print ("Table created successfully");
     return conn
 
 #Connection a la base de donnee
@@ -29,6 +30,7 @@ def connectBase():
             conn = sqlite3.connect(databaseName)
             return conn
         conn = createBase()
+        print ("Connected successfully")
         return conn
     except:
         return False

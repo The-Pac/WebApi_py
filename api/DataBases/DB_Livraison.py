@@ -15,13 +15,14 @@ def createBase():
     
     c = conn.cursor()
     c.execute('''CREATE TABLE LIVRAISONS (
-                        id_Livraison    INTERGER PRIMARY KEY,,
+                        id_Livraison    INTEGER PRIMARY KEY AUTOINCREMENT,
                         id_paquet       INTERGER,
                         statut          TEXT,
-                        robot           text,
-                        dateheure       text
+                        robot           INTERGER,
+                        dateheure       TEXT,
                         FOREIGN KEY(id_paquet) REFERENCES PAQUETS(id_paquet))''')
     conn.commit()
+    print ("Table created successfully");
     return conn
 
 #Connection a la base de donnee
@@ -32,6 +33,7 @@ def connectBase():
             conn = sqlite3.connect(databaseName)
             return conn
         conn = createBase()
+        print ("Connected successfully")
         return conn
     except:
         return False

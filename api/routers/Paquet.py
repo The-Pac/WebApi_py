@@ -1,3 +1,6 @@
+#link use for joint database : 
+# https://fastapi.tiangolo.com/advanced/dataclasses/?h=data
+
 from http.client import HTTPException
 from fastapi import APIRouter, HTTPException
 from typing import List, Optional

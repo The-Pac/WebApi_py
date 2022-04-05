@@ -14,17 +14,16 @@ def createBase():
     
     c = conn.cursor()
     c.execute('''CREATE TABLE ROBOTS (
-                        id_robot  text,
-                        nom       text,
-                        statut    text )
-                        ''')
+                        id_robot  INTEGER PRIMARY KEY AUTOINCREMENT,
+                        nom       TEXT,
+                        statut    TEXT
+                        )''')
     conn.commit()
     print ("Table created successfully");
     return conn
 
 #Connection a la base de donnee
 def connectBase():
-   
     try:
         file = Path(databaseName)
         if file.exists ():
@@ -38,61 +37,23 @@ def connectBase():
 
 #Ajouter un nouveau robot en controlant ses valeurs
 def addNew(id_robot,nom,statut):
-    print("st : ",statut)
-    '''
-    # control parameters
-    msg = ''
-    if type(id_robot)       != type('A') :              msg += "identifiant isn't correct. "
-    if type(nom)            != type('A') :              msg += "nom  isn't correct. "
-    if type(statut)         != type('A') :              msg += "statut 'type' isn't correct. " 
-    #if not statut == "on" and not statut == "off" :    msg += "statut 'value' isn't correct. "
-    if msg != '': return msg
-    '''
     with connectBase() as conn:   
         c = conn.cursor()
-        #controle des doublons et suppression si robot deja present dans la base
-        rSQL = '''DELETE FROM ROBOT WHERE id_robot = {}
-                                           AND nom = {}
-                                           AND statut = {};'''
-        c.execute(rSQL.format(id_robot,nom,statut))
 
-        #le robot n'existe et il est ajouter a la base 
-        rSQL = "INSERT INTO ROBOT VALUES ('{}', '{}', '{}')".format(id_robot, nom, statut)
-                         #; '''
+        # in order to avoid replication, we control if this record already exists:
+        # in this example, we try to delete directly the potential duplicate
+        rSQL = '''DELETE FROM ROBOTS WHERE id_robot  = '{}'
+                                           AND nom = '{}'
+                                           AND statut = '{}';'''
+        c.execute(rSQL.format(id_robot , nom, statut))
+
+        #and now, insert 'new' record (really new or not) 
+        rSQL = '''INSERT INTO ROBOTS (id_robot , nom, statut)
+                        VALUES ('{}', '{}', '{}') ; '''
+
+        c.execute(rSQL.format(id_robot , nom, statut))
         conn.commit()
-        c.execute(rSQL.format(id_robot,nom,statut))
-        
     return True
-
-#Affiche tous les robots en fonction des parametres saisie
-def printAlls(id_robot='', nom='', statut=''):
-    conn = connectBase()
-    if conn:
-        c = conn.cursor()
-        rSQL = " "
-        if id_robot != '':
-            rSQL = " WHERE id_robot = {"+id_robot+"} "
-        if nom != '':
-            if rSQL == " ":
-                rSQL = " WHERE "
-            else:
-                rSQL += " and "
-            rSQL = "nom = {"+nom+"} "
-        if statut != '':
-            if rSQL == " ":
-                rSQL = " WHERE "
-            else:
-                rSQL += " and "
-            rSQL = "statut = {"+statut+"} "
-            
-        rSQL = '''SELECT * from ROBOT ''' + rSQL
-        #print(rSQL)
-        c.execute(rSQL)
-        rows = c.fetchall()
-        for _id, _id_robot,_nom,_statut in rows:
-            yield  _id, _id_robot,_nom,_statut 
-        conn.close()
-
 
 def test():
     print("ajout d'un nouveau robot")
@@ -101,7 +62,7 @@ def test():
     print("..", addNew('tonton', 'mimo', 'on'))
     print("ajout d'un nouveau robot")
     print("..", addNew('tota', 'mimo', 'off'))
-
+    '''
     print("liste des robots")
     for fc in printAlls():
         print('..', fc)
@@ -111,7 +72,7 @@ def test():
     for fc in printAlls(nom="mimo"):
         print('..', fc)    
     print("")
-
+    '''
 if __name__ == '__main__':
     test()
 
