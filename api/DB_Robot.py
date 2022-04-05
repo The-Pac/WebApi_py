@@ -41,7 +41,7 @@ def addNew(identifiant,nom,statut):
     # control parameters
     msg = ''
     if type(identifiant)       != type(0) or\
-       identifiant < 0:                                    msg += "identifiant not correct. "
+       identifiant < 0:                                 msg += "identifiant not correct. "
     if type(nom)            != type('A') :              msg += "nom  isn't correct. "
     if type(statut)         != type('A') :              msg += "statut 'type' isn't correct. " 
     if not statut == "on" and not statut == "off" :     msg += "statut 'value' isn't correct. "

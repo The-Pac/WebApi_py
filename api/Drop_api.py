@@ -6,9 +6,7 @@ from http.client import HTTPException
 from fastapi import Depends, FastAPI, HTTPException
 from typing import List, Optional
 from pydantic import BaseModel
-from routers import Croisement,Livraison,Maison,Paquet,Robot
-
-
+import Croisement,Livraison,Maison,Paquet,Robot
 
 #pour une execution sans redemarage de fastapi :
 #uvicorn todo:app --reload
@@ -21,6 +19,8 @@ appDrop.include_router(Livraison.app)
 appDrop.include_router(Maison.app)
 appDrop.include_router(Paquet.app)
 appDrop.include_router(Robot.app)
+
+
 
 #Les bases de donnee dont Drop_api depend
 '''

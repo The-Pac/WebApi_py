@@ -1,39 +1,46 @@
 from http.client import HTTPException
-from fastapi import APIRouter, HTTPException
-from typing import List, Optional
+from fastapi import APIRouter, HTTPException, Request
+from typing import List, Optional, Dict, Any
 from pydantic import BaseModel
+import DB_Robot
+
 
 app = APIRouter()
 
 class Robot(BaseModel):
-    id_robot : int
-    nom_robot : str
-    statut_robot : bool
+    identifiant : int
+    nom : str
+    statut : bool
 
-Robots = [
-
-]
+Robots = []
 
 #creation de la lecture ecriture mise à jour et suppression d'elements:
 #liste des robots
-@app.get("/robots/",tags = ['Robot'],response_model=List[Robot]) 
+@app.get("/robots/",tags = ['Robot']) 
 async def get_robots():
+    ''' print("liste des robots")
+    data : dict
+    for fc in DB_Robot.printAlls():
+        data += fc'''
     return Robots
 
 #Reccupere le robot avec son id d'identification
 @app.get("/robot/{id}",tags = ['Robot'])
 async def get_robot(id:int):
     try : 
-        return Robots[id]
+        return DB_Robot.printAlls(identifiant=id)
     except:
         raise HTTPException(status_code=404, detail="Object not found in DataBase")
     
 #ajoute un robot
 @app.post("/robot/",tags = ['Robot'])
 async def create_robot(robot: Robot):
-    Robots.append(robot)
+    #Robots.append(DB_Robot.addNew(robot.identifiant,robot.nom,robot.statut))
+    DB_Robot.addNew(robot.identifiant,robot.nom,robot.statut)
     return robot
 
+'''
+#A supprimer
 #mise a jour du robot
 @app.put("/robot/{id}",tags = ['Robot'])
 async def update_robot(id : int , new_robot : Robot):
@@ -43,7 +50,7 @@ async def update_robot(id : int , new_robot : Robot):
         return Robots[id] 
     except:
         raise HTTPException(status_code=404, detail="Object not found in DataBase")
-
+#A supprimer
 #supprime le robot  
 @app.delete("/robot/{id}",tags = ['Robot'])
 async def delete_robot(id : int):
@@ -53,4 +60,4 @@ async def delete_robot(id : int):
         return objRobot
     except:
         raise HTTPException(status_code=404, detail="Object not found in DataBase")
-    
+'''    
