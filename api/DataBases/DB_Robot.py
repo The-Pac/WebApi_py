@@ -15,8 +15,8 @@ def createBase():
     c = conn.cursor()
     c.execute('''CREATE TABLE ROBOTS (
                         id_robot  INTEGER PRIMARY KEY AUTOINCREMENT,
-                        nom       TEXT,
-                        statut    TEXT
+                        nom       TEXT NOT NULL,
+                        statut    TEXT NOT NULL
                         )''')
     conn.commit()
     print ("Table created successfully");
@@ -36,32 +36,31 @@ def connectBase():
         return False
 
 #Ajouter un nouveau robot en controlant ses valeurs
-def addNew(id_robot,nom,statut):
+def addNew(nom,statut):
     with connectBase() as conn:   
         c = conn.cursor()
 
         # in order to avoid replication, we control if this record already exists:
         # in this example, we try to delete directly the potential duplicate
-        rSQL = '''DELETE FROM ROBOTS WHERE id_robot  = '{}'
-                                           AND nom = '{}'
+        rSQL = '''DELETE FROM ROBOTS WHERE nom = '{}'
                                            AND statut = '{}';'''
-        c.execute(rSQL.format(id_robot , nom, statut))
+        c.execute(rSQL.format(nom, statut))
 
         #and now, insert 'new' record (really new or not) 
-        rSQL = '''INSERT INTO ROBOTS (id_robot , nom, statut)
-                        VALUES ('{}', '{}', '{}') ; '''
+        rSQL = '''INSERT INTO ROBOTS (nom, statut)
+                        VALUES ('{}', '{}') ; '''
 
-        c.execute(rSQL.format(id_robot , nom, statut))
+        c.execute(rSQL.format(nom, statut))
         conn.commit()
     return True
 
 def test():
     print("ajout d'un nouveau robot")
-    print("..", addNew('titi', 'taty', 'on'))
+    print("..", addNew('taty', 'on'))
     print("ajout d'un nouveau robot")
-    print("..", addNew('tonton', 'mimo', 'on'))
+    print("..", addNew('mimo', 'on'))
     print("ajout d'un nouveau robot")
-    print("..", addNew('tota', 'mimo', 'off'))
+    print("..", addNew('mimo', 'off'))
     '''
     print("liste des robots")
     for fc in printAlls():
