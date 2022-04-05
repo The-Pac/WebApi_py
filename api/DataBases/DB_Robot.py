@@ -37,16 +37,20 @@ def connectBase():
 
 #Ajouter un nouveau robot en controlant ses valeurs
 def addNew(nom,statut):
+    # control parameters
+    msg = ''
+    if type(nom)            != type('A') :              msg += "nom  isn't correct. "
+    if type(statut)         != type('A') :              msg += "statut 'type' isn't correct. " 
+    if not statut == "on" and not statut == "off" :     msg += "statut 'value' isn't correct. "
+    if msg != '': return msg
+    
     with connectBase() as conn:   
         c = conn.cursor()
-
-        # in order to avoid replication, we control if this record already exists:
-        # in this example, we try to delete directly the potential duplicate
+        #Si l'objet existe deja suppression 
         rSQL = '''DELETE FROM ROBOTS WHERE nom = '{}'
                                            AND statut = '{}';'''
         c.execute(rSQL.format(nom, statut))
-
-        #and now, insert 'new' record (really new or not) 
+        #Ajouter le Nouvel object
         rSQL = '''INSERT INTO ROBOTS (nom, statut)
                         VALUES ('{}', '{}') ; '''
 
@@ -54,24 +58,51 @@ def addNew(nom,statut):
         conn.commit()
     return True
 
+#Affiche tous les robots en fonction des parametres saisie
+def printAlls(id_robot='', nom='', statut=''):
+    conn = connectBase()
+    if conn:
+        c = conn.cursor()
+        rSQL = " "
+        if nom != '':
+            rSQL = " WHERE id_robot = '"+nom+"' "
+        if statut != '':
+            if rSQL == " ":
+                rSQL = " WHERE "
+            else:
+                rSQL += " and "
+            rSQL = "statut = '"+statut+"' "
+            
+        rSQL = '''SELECT * from ROBOTS ''' + rSQL
+        c.execute(rSQL)
+        rows = c.fetchall()
+        for _id_robot,_nom,_statut in rows:
+            yield  _id_robot,_nom,_statut 
+        conn.close()
+
 def test():
     print("ajout d'un nouveau robot")
-    print("..", addNew('taty', 'on'))
+    print("Robot 1 :", addNew('taty', 'on'))
     print("ajout d'un nouveau robot")
-    print("..", addNew('mimo', 'on'))
+    print("Robot 2 :", addNew('mimo', 'on'))
     print("ajout d'un nouveau robot")
-    print("..", addNew('mimo', 'off'))
-    '''
+    print("Robot 3 :", addNew('mimo', 'off'))
+
     print("liste des robots")
     for fc in printAlls():
-        print('..', fc)
+        print('Robot : ', fc)
     print("")
 
-    print("liste des robots nommé 'mimo'")
+    print("liste des robots nommés 'mimo'")
     for fc in printAlls(nom="mimo"):
-        print('..', fc)    
+        print('Robot : ', fc)    
     print("")
-    '''
+
 if __name__ == '__main__':
     test()
+
+
+
+
+
 
