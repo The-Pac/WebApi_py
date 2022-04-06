@@ -14,7 +14,7 @@ def createBase():
     
     c = conn.cursor()
     c.execute('''CREATE TABLE ROBOTS (
-                        id        INTEGER PRIMARY KEY ,
+                        id        INTEGER PRIMARY KEY AUTOINCREMENT,
                         identifiant  INTEGER,
                         nom       TEXT NOT NULL,
                         statut    TEXT NOT NULL
@@ -84,12 +84,8 @@ def printAlls(identifiant='', nom='', statut=''):
         rSQL = '''SELECT * from ROBOTS ''' + rSQL
         c.execute(rSQL)
         rows = c.fetchall()
-        print('Rows: ',rows)
         for row in rows:
             yield row
-        #for _id,_identifiant,_nom,_statut in rows:
-        #    yield  _id,_identifiant,_nom,_statut 
-        #conn.close()
 
 def test():
     print("ajout d'un nouveau robot")
@@ -99,12 +95,12 @@ def test():
     print("ajout d'un nouveau robot")
     print("Robot 3 :", addNew(2,'mimo', 'off'))
 
-    print("liste des robots")
+    print("liste des objects")
     for fc in printAlls():
         print('Robot : ', fc)
     print("")
 
-    print("liste des robots nommés 'mimo'")
+    print("liste des objects nommés 'mimo'")
     for fc in printAlls(nom='mimo'):
         print('Robot : ', fc)    
     print("")

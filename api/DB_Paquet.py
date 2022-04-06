@@ -15,8 +15,8 @@ def createBase():
     
     c = conn.cursor()
     c.execute('''CREATE TABLE PAQUETS (
-                        id              INTEGER PRIMARY KEY ,
-                        identifiant     INTEGER,
+                        id        INTEGER PRIMARY KEY AUTOINCREMENT,
+                        identifiant  INTEGER,
                         destination     TEXT NOT NULL,
                         arrivee         TEXT  
                         )''')
@@ -128,12 +128,12 @@ def test():
     print("ajout d'un nouveau paquet")
     print("Paquet 3 :", addNew(4,'tito'))
 
-    print("liste des paquets")
+    print("liste des objects")
     for fc in printAlls():
         print('..', fc)
     print("")
 
-    print("liste des paquets nommé 'tito'")
+    print("liste des objects nommé 'tito'")
     for fc in printAlls(destination="tito"):
         print('..', fc)    
     print("")

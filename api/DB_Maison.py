@@ -15,10 +15,11 @@ def createBase():
     
     c = conn.cursor()
     c.execute('''CREATE TABLE MAISONS (
-                        id_maison        INTEGER PRIMARY KEY AUTOINCREMENT,
+                        id        INTEGER PRIMARY KEY AUTOINCREMENT,
+                        identifiant  INTEGER,
                         croisement       INTERGER,
                         emplacement      TEXT
-                        )''')
+                        FOREIGN KEY(croisement) REFERENCES CROISEMENTS(identifiant))''')
     conn.commit()
     print ("Table created successfully");
     return conn
@@ -36,5 +37,74 @@ def connectBase():
     except:
         return False
 
+#Ajouter un nouvel object en controlant ses valeurs
+def addNew(identifiant,croisement,emplacement):
+    # control parameters
+    msg = ''
+    if type(identifiant)     != type(0) or\
+       identifiant < 0:                                                 msg += "identifiant isn't correct. "
+    if type(croisement)      != type('A') or len(croisement) != 4 :     msg += "croisement  isn't correct. "
+    if type(emplacement)     != type('A') :                             msg += "emplacement isn't correct. " 
+    if msg != '': return msg
     
+    with connectBase() as conn:   
+        c = conn.cursor()
+        #Si l'objet existe deja suppression 
+        rSQL = '''DELETE FROM MAISONS WHERE identifiant = '{}'
+                                           AND croisement = '{}'
+                                           AND emplacement = '{}';'''
+        c.execute(rSQL.format(identifiant,croisement, emplacement))
+        #Ajouter le Nouvel object
+        rSQL = '''INSERT INTO MAISONS (identifiant,croisement, emplacement)
+                        VALUES ('{}','{}', '{}') ; '''
+
+        c.execute(rSQL.format(identifiant,croisement, emplacement))
+        conn.commit()
+    return True
+
+#Affiche tous les objects en fonction des parametres saisie
+def printAlls(identifiant='', croisement='', emplacement=''):
+    conn = connectBase()
+    if conn:
+        c = conn.cursor()
+        rSQL = " "
+        if identifiant != '':
+            rSQL = " WHERE identifiant = '"+identifiant+"' "
+        if croisement != '':
+            if rSQL == " ":
+                rSQL = " WHERE croisement = '"+croisement+"' "
+            else:
+                rSQL += " and croisement = '"+croisement+"' "
+        if emplacement != '':
+            if rSQL == " ":
+                rSQL = " WHERE emplacement = '"+emplacement+"' "
+            else:
+                rSQL += " and emplacement = '"+emplacement+"' "
+            
+        rSQL = '''SELECT * from MAISONS ''' + rSQL
+        c.execute(rSQL)
+        rows = c.fetchall()
+        for row in rows:
+            yield row
+
+def test():
+    print("ajout d'un nouveau maison")
+    print("Maison 1 :", addNew(3,'taty', 'on'))
+    print("ajout d'un nouveau maison")
+    print("Maison 2 :", addNew(5,'mimo', 'on'))
+    print("ajout d'un nouveau maison")
+    print("Maison 3 :", addNew(2,'mimo', 'off'))
+
+    print("liste des objects")
+    for fc in printAlls():
+        print('Maison : ', fc)
+    print("")
+
+    print("liste des robots nommés 'mimo'")
+    for fc in printAlls(croisement='mimo'):
+        print('Maison : ', fc)    
+    print("")
+
+if __name__ == '__main__':
+    test()    
     
