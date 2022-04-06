@@ -2,6 +2,7 @@
 import sqlite3
 from sqlite3 import Error
 from pathlib import Path
+import json
 
 databaseName = "Robot.db"
 
@@ -29,6 +30,8 @@ def connectBase():
         file = Path(databaseName)
         if file.exists ():
             conn = sqlite3.connect(databaseName)
+            conn.row_factory = lambda c, r: dict(
+            [(col[0], r[idx]) for idx, col in enumerate(c.description)])
             return conn
         conn = createBase()
         print ("Connected successfully");
@@ -83,6 +86,7 @@ def printAlls(identifiant='', nom='', statut=''):
         rSQL = '''SELECT * from ROBOTS ''' + rSQL
         c.execute(rSQL)
         rows = c.fetchall()
+        print('rows : ',rows)
         for row in rows:
             yield row
 
@@ -101,7 +105,7 @@ def test():
 
     print("liste des objects nommés 'mimo'")
     for fc in printAlls(nom='mimo'):
-        print('Robot : ', fc)    
+        print('Robot : ', fc)     
     print("")
 
 if __name__ == '__main__':

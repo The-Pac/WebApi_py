@@ -30,6 +30,8 @@ def connectBase():
         file = Path(databaseName)
         if file.exists ():
             conn = sqlite3.connect(databaseName)
+            conn.row_factory = lambda c, r: dict(
+            [(col[0], r[idx]) for idx, col in enumerate(c.description)])
             return conn
         conn = createBase()
         print ("Connected successfully")
@@ -107,12 +109,13 @@ def printAlls(identifiant='', maison='', arrivee=''):
                 rSQL = " WHERE maison = '"+maison+"' "
             else:
                 rSQL += " and maison = '"+maison+"' "
+        '''
         if arrivee != '':
             if rSQL == " ":
                 rSQL = " WHERE arrivee = '"+arrivee+"' "
             else:
                 rSQL += " and arrivee = '"+arrivee+"' "
-            
+        '''   
         rSQL = '''SELECT * from PAQUETS ''' + rSQL
         c.execute(rSQL)
         rows = c.fetchall()

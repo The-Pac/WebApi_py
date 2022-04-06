@@ -5,13 +5,13 @@ from pathlib import Path
 import datetime
 
 
-dbRobot = "Robot.db"
-dbPaquet = "Paquet.db"
-dbCroisement = "Croisement.db"
-dbMaison = "Maison.db"
-dbLivraison = "Livraison.db"
+#dbRobot = "Robot.db"
+#dbPaquet = "Paquet.db"
+#dbCroisement = "Croisement.db"
+#dbMaison = "Maison.db"
+#dbLivraison = "Livraison.db"
 
-db_All_Table = "All_Tables"
+db_All_Table = "All_Tables.db"
 #db_All_Table.
 
 ####################################
@@ -21,7 +21,7 @@ db_All_Table = "All_Tables"
 
 def createDBRobot():
     try:
-        conn = sqlite3.connect(dbRobot)
+        conn = sqlite3.connect(db_All_Table)
     except Error as e:
         return False
     
@@ -32,69 +32,33 @@ def createDBRobot():
                         nom             TEXT NOT NULL,
                         statut          TEXT NOT NULL
                         )''')
-    conn.commit()
-    print ("Table created successfully");
-    return conn
-
-def createDBPaquet():
-    try:
-        conn = sqlite3.connect(dbPaquet)
-    except Error as e:
-        return False
-    
-    c = conn.cursor()
+    #conn.commit()
+    print ("Table ROBOTS created successfully");
     c.execute('''CREATE TABLE PAQUETS (
                         id              INTEGER PRIMARY KEY AUTOINCREMENT,
                         identifiant     TEXT,
                         maison          TEXT,
                         arrivee         TEXT,  
                         FOREIGN KEY(maison) REFERENCES MAISONS(identifiant))''')
-    conn.commit()
-    print ("Table created successfully");
-    return conn
-
-def createDBCroisement():
-    try:
-        conn = sqlite3.connect(dbCroisement)
-    except Error as e:
-        return False
-    
-    c = conn.cursor()
+    #conn.commit()
+    print ("Table PAQUETS created successfully");
     c.execute('''CREATE TABLE CROISEMENTS (
                         id              INTEGER PRIMARY KEY AUTOINCREMENT,
                         identifiant     INTEGER,
                         position        INTEGER 
                         )''')
-    conn.commit()
-    print ("Table created successfully");
-    return conn
-
-def createDBMaison():
-    try:
-        conn = sqlite3.connect(dbMaison)
-    except Error as e:
-        return False
-    
-    c = conn.cursor()
+    #conn.commit()
+    print ("Table CROISEMENTS created successfully");
     c.execute('''CREATE TABLE MAISONS (
-                        id        INTEGER PRIMARY KEY AUTOINCREMENT,
-                        identifiant      INTEGER,
-                        numero
-                        croisement       INTEGER,
-                        emplacement      TEXT,
+                        id                      INTEGER PRIMARY KEY AUTOINCREMENT,
+                        identifiant             TEXT,
+                        numero                  INTEGER,
+                        croisement              TEXT,
+                        emplacement             TEXT,
                         FOREIGN KEY(croisement) REFERENCES CROISEMENTS(identifiant),
                         FOREIGN KEY(croisement) REFERENCES CROISEMENTS(identifiant))''')
-    conn.commit()
-    print ("Table created successfully");
-    return conn
-
-def createDBLivraison():
-    try:
-        conn = sqlite3.connect(dbLivraison)
-    except Error as e:
-        return False
-    
-    c = conn.cursor()
+    #conn.commit()
+    print ("Table MAISONS created successfully");
     c.execute('''CREATE TABLE LIVRAISONS (
                         id              INTEGER PRIMARY KEY AUTOINCREMENT,
                         identifiant     TEXT,
@@ -102,26 +66,25 @@ def createDBLivraison():
                         statut          TEXT,
                         robot           TEXT,
                         dateheure       TEXT,
-                        FOREIGN KEY(paquet) REFERENCES PAQUETS(identifiant))''')
+                        FOREIGN KEY(paquet) REFERENCES PAQUETS(identifiant),
+                        FOREIGN KEY(robot) REFERENCES ROBOTS(identifiant))''')
     conn.commit()
-    print ("Table created successfully");
+    print ("Table LIVRAISONS created successfully");
     return conn
 
 ##################################################
 ####### Connections a la base de donnee ##########
 ##################################################
 
-def connectBase(dbName):
+def connectBase():
     try:
-        file = Path(dbName)
+        file = Path(db_All_Table)
         if file.exists ():
-            conn = sqlite3.connect(dbName)
+            conn = sqlite3.connect(db_All_Table)
+            conn.row_factory = lambda c, r: dict(
+            [(col[0], r[idx]) for idx, col in enumerate(c.description)])
             return conn
-        if (dbName == dbRobot)          : conn = createDBRobot()
-        if (dbName == dbPaquet)         : conn = createDBPaquet()
-        if (dbName == dbCroisement)     : conn = createDBCroisement()
-        if (dbName == dbMaison)         : conn = createDBMaison()
-        if (dbName == dbLivraison)      : conn = createDBLivraison()
+        conn = createDBRobot()
         
         print ("Connected successfully");
         return conn
@@ -141,7 +104,7 @@ def addRobot(identifiant,nom,statut):
     if not statut == "en cours" and not statut == "pret" and not statut == "retour":     msg += "statut 'value' isn't correct. "
     if msg != '': return msg
     
-    with connectBase(dbRobot) as conn:   
+    with connectBase() as conn:   
         c = conn.cursor()
         #Si l'objet existe deja suppression 
         rSQL = '''DELETE FROM ROBOTS WHERE identifiant = '{}'
@@ -167,7 +130,7 @@ def addPaquet(identifiant,maison):
     if arrivee == False:                msg += "Arrivee isn't correct. "
     if msg != '': return msg
     
-    with connectBase(dbPaquet) as conn:   
+    with connectBase() as conn:   
         c = conn.cursor()
         #Si l'objet existe deja suppression 
         rSQL = '''DELETE FROM PAQUETS WHERE identifiant = '{}' AND maison = '{}' AND arrivee = '{}';'''
@@ -214,7 +177,7 @@ def addCroisement(identifiant,position):
     #if not type(position) == "on" and not position == "off" :     msg += "position 'value' isn't correct. "
     if msg != '': return msg
     
-    with connectBase(dbCroisement) as conn:   
+    with connectBase() as conn:   
         c = conn.cursor()
         #Si l'objet existe deja suppression 
         rSQL = '''DELETE FROM CROISEMENTS WHERE identifiant = '{}'
@@ -228,50 +191,60 @@ def addCroisement(identifiant,position):
         conn.commit()
     return True
 
-def addMaison(identifiant,croisement,emplacement):
+def addMaison(identifiant,numero,croisement,emplacement):
     # control parameters
     msg = ''
-    if type(identifiant)     != type('A') :                             msg += "identifiant isn't correct. "
+    if type(identifiant)     != type('A'):                              msg += "identifiant isn't correct. "
+    if type(numero)          != type(0):                                msg += "identifiant isn't correct. "
     if type(croisement)      != type('A') or len(croisement) != 4 :     msg += "croisement  isn't correct. "
     if type(emplacement)     != type('A') :                             msg += "emplacement isn't correct. " 
     if msg != '': return msg
     
-    with connectBase(dbMaison) as conn:   
+    with connectBase() as conn:   
         c = conn.cursor()
         #Si l'objet existe deja suppression 
         rSQL = '''DELETE FROM MAISONS WHERE identifiant = '{}'
+                                           AND numero = '{}'
                                            AND croisement = '{}'
                                            AND emplacement = '{}';'''
-        c.execute(rSQL.format(identifiant,croisement, emplacement))
+        c.execute(rSQL.format(identifiant,numero,croisement,emplacement))
         #Ajouter le Nouvel object
-        rSQL = '''INSERT INTO MAISONS (identifiant,croisement, emplacement)
-                        VALUES ('{}','{}', '{}') ; '''
+        rSQL = '''INSERT INTO MAISONS (identifiant,numero,croisement,emplacement)
+                        VALUES ('{}','{}','{}','{}') ; '''
 
-        c.execute(rSQL.format(identifiant,croisement, emplacement))
+        c.execute(rSQL.format(identifiant,numero,croisement,emplacement))
         conn.commit()
     return True
 
-def addLivraison(identifiant,nom,statut):
+def addLivraison(identifiant,paquet,statut,robot):
     # control parameters
+    date_Actual = str(datetime.datetime.now().strftime("%Y%m%d %H:%M:%S"))
     msg = ''
-    if type(identifiant)    != type('A') :              msg += "identifiant not correct. "
-    if type(nom)            != type('A') :              msg += "nom  isn't correct. "
-    if type(statut)         != type('A') :              msg += "statut 'type' isn't correct. " 
-    if not statut == "on" and not statut == "off" :     msg += "statut 'value' isn't correct. "
+    if type(identifiant)        != type('A'):               msg += "identifiant not correct. "
+    if type(paquet)             != type('A') :              msg += "nom  isn't correct. "
+    if type(statut)             != type('A') :              msg += "statut 'type' isn't correct. " 
+    if type(robot)              != type('A'):               msg += "identifiant not correct. " 
+    if not statut == "a livrer" and not statut == "en cours de livraison" and not statut == "livré" :         
+        msg += "statut 'value' isn't correct. "
+    dateheure = controlDate(date_Actual)
+    if dateheure == False:
+        msg += "Date isn't correct. "
     if msg != '': return msg
     
-    with connectBase(dbLivraison) as conn:   
+    with connectBase() as conn:   
         c = conn.cursor()
         #Si l'objet existe deja suppression 
         rSQL = '''DELETE FROM ROBOTS WHERE identifiant = '{}'
-                                           AND nom = '{}'
-                                           AND statut = '{}';'''
-        c.execute(rSQL.format(identifiant,nom, statut))
+                                           AND paquet = '{}'
+                                           AND statut = '{}',
+                                           AND robot = '{}'
+                                           AND dateheure = '{}';'''
+        c.execute(rSQL.format(identifiant,paquet,statut,robot,dateheure))
         #Ajouter le Nouvel object
-        rSQL = '''INSERT INTO ROBOTS (identifiant,nom, statut)
-                        VALUES ('{}','{}', '{}') ; '''
+        rSQL = '''INSERT INTO ROBOTS (identifiant,paquet,statut,robot,dateheure)
+                        VALUES ('{}','{}', '{}', '{}', '{}') ; '''
 
-        c.execute(rSQL.format(identifiant,nom, statut))
+        c.execute(rSQL.format(identifiant,paquet,statut,robot,dateheure))
         conn.commit()
     return True
 
@@ -280,7 +253,7 @@ def addLivraison(identifiant,nom,statut):
 ##################################################################################
 
 def printRobot(identifiant='', nom='', statut=''):
-    conn = connectBase(dbRobot)
+    conn = connectBase()
     if conn:
         c = conn.cursor()
         rSQL = " "
@@ -333,8 +306,7 @@ def printCroisement(identifiant='', position=''):
         c = conn.cursor()
         rSQL = " "
         if identifiant != '':
-            rSQL = " WHERE identifiant = '"+identifiant+"' "
-        
+            rSQL = " WHERE identifiant = '"+identifiant+"' " 
         if position != '':
             if rSQL == " ":
                 rSQL = " WHERE position = '"+position+"' "
@@ -347,7 +319,63 @@ def printCroisement(identifiant='', position=''):
         for row in rows:
             yield row
 
+def printMaison(identifiant='',numero= '', croisement='', emplacement=''):
+    conn = connectBase()
+    if conn:
+        c = conn.cursor()
+        rSQL = " "
+        if identifiant != '':
+            rSQL = " WHERE identifiant = '"+identifiant+"' "
+        if numero != '':
+            if rSQL == " ":
+                rSQL = " WHERE croisement = '"+croisement+"' "
+            else:
+                rSQL += " and croisement = '"+croisement+"' "
+        if croisement != '':
+            if rSQL == " ":
+                rSQL = " WHERE croisement = '"+croisement+"' "
+            else:
+                rSQL += " and croisement = '"+croisement+"' "
+        if emplacement != '':
+            if rSQL == " ":
+                rSQL = " WHERE emplacement = '"+emplacement+"' "
+            else:
+                rSQL += " and emplacement = '"+emplacement+"' "
             
+        rSQL = '''SELECT * from MAISONS ''' + rSQL
+        c.execute(rSQL)
+        rows = c.fetchall()
+        for row in rows:
+            yield row    
+
+def printLivraison(identifiant='',paquet='',statut='',robot=''):
+    conn = connectBase()
+    if conn:
+        c = conn.cursor()
+        rSQL = " "
+        if identifiant != '':
+            rSQL = " WHERE identifiant = '"+identifiant+"' "
+        if paquet != '':
+            if rSQL == " ":
+                rSQL = " WHERE paquet = '"+paquet+"' "
+            else:
+                rSQL += " and paquet = '"+paquet+"' "
+        if statut != '':
+            if rSQL == " ":
+                rSQL = " WHERE statut = '"+statut+"' "
+            else:
+                rSQL += " and statut = '"+statut+"' "
+        if robot != '':
+            if rSQL == " ":
+                rSQL = " WHERE robot = '"+robot+"' "
+            else:
+                rSQL += " and robot = '"+robot+"' "
+            
+        rSQL = '''SELECT * from ROBOTS ''' + rSQL
+        c.execute(rSQL)
+        rows = c.fetchall()
+        for row in rows:
+            yield row
 
 ###################################
 ##########    TESTS    ############
@@ -357,12 +385,19 @@ def test():
     print("ajout d'un nouveau object")
     print("Robot 1 :", addRobot('3','taty', 'en cours'))
     print("Paquet 1 :", addPaquet('3','taty'))
+    print("Croisement 1 :", addCroisement('3','4,5'))
+    print("Maison 1 :", addMaison('3',2,'2,1', '4,5'))
+    print("Livraison 1 :", addLivraison('3','2','2,1', '4,5'))
 
     print("Robot 2 :",  addRobot('5','mimo', 'pret'))
     print("Paquet 2 :", addPaquet('6','tito'))
+    print("Croisement 2 :", addCroisement('2','2,1'))
+    print("Maison 2 :", addMaison('5',7,'2,1', '2,1'))
     
     print("Robot 3 :",  addRobot('2','mimo', 'retour'))
     print("Paquet 3 :", addPaquet('4','tito'))
+    print("Croisement 3 :", addCroisement('2','4,2'))
+    print("Maison 3 :", addMaison('2',1,'3,1', '3,1'))
 
     print("liste des objects")
     for fc in printRobot():
@@ -371,13 +406,25 @@ def test():
     for fc in printPaquet():
         print('Paquet', fc)
     print("")
+    for fc in printCroisement():
+        print('Croisement', fc)
+    print("")
+    for fc in printMaison():
+        print('Maison', fc)
+    print("")
 
     print("liste des objects : 'mimo'")
     for fc in printRobot(nom='mimo'):
         print('Robot : ', fc)    
     print("")
-    for fc in print(maison="tito"):
+    for fc in printPaquet(maison="tito"):
         print('Paquet', fc)    
+    print("")
+    for fc in printCroisement(position="2,1"):
+        print('Croisement : ', fc)    
+    print("")
+    for fc in printMaison(croisement="2,1"):
+        print('Maison :', fc)    
     print("")
 
 if __name__ == '__main__':

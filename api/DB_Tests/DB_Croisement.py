@@ -15,7 +15,7 @@ def createBase():
     c = conn.cursor()
     c.execute('''CREATE TABLE CROISEMENTS (
                         id              INTEGER PRIMARY KEY AUTOINCREMENT,
-                        identifiant     INTEGER,
+                        identifiant     TEXT,
                         position        INTEGER 
                         )''')
     conn.commit()

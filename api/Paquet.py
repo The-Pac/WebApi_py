@@ -5,14 +5,14 @@ from http.client import HTTPException
 from fastapi import APIRouter, HTTPException
 from typing import List, Optional
 from pydantic import BaseModel
-import DB_Paquet
+import DB_Tables
 
 app = APIRouter()
 
 class Paquet(BaseModel):
-    identifiant : Optional[str]
-    maison : Optional[str]
-    date_arr : Optional[str]
+    identifiant : str
+    maison : str
+    date_arr : str
 
 Paquets = []
 
@@ -21,19 +21,19 @@ Paquets = []
 @app.get("/paquets/",tags = ['Paquet']) 
 async def get_paquets():
     try : 
-        return  {DB_Paquet.printAlls()}
+        return  {DB_Tables.printPaquet()}
     except:
         raise HTTPException(status_code=404, detail="Object not found in DataBase")
 
 #Reccupere le paquet avec son id d'identification
-@app.get("/paquet/{id}",tags = ['Paquet'])
-async def get_paquet(id:int):
+@app.get("/paquet/{identifiant}",tags = ['Paquet'])
+async def get_paquet(identifiant:int):
     try : 
-        return Paquets[id]
+        return  {DB_Tables.printPaquet(identifiant=identifiant)}
     except:
         raise HTTPException(status_code=404, detail="Object not found in DataBase")
     
 #ajoute un paquet
 @app.post("/paquet",tags = ['Paquet'])
 async def create_paquet(paquet : Paquet):
-    return DB_Paquet.addNew(paquet.identifiant,paquet.maison,paquet.date_arr)
+    return DB_Tables.addPaquet(paquet.identifiant,paquet.maison,paquet.date_arr)

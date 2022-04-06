@@ -5,6 +5,7 @@ from pathlib import Path
 import DB_Croisement
 
 databaseName = "Maison.db"
+position = ['-1,0','0,0','1,0','0,1','0,-1']
 
 #Creation de la Table
 def createBase():
@@ -15,11 +16,11 @@ def createBase():
     
     c = conn.cursor()
     c.execute('''CREATE TABLE MAISONS (
-                        id        INTEGER PRIMARY KEY AUTOINCREMENT,
-                        identifiant      INTEGER,
-                        numero
-                        croisement       INTEGER,
-                        emplacement      TEXT,
+                        id                      INTEGER PRIMARY KEY AUTOINCREMENT,
+                        identifiant             TEXT,
+                        numero                  INTEGER,
+                        croisement              TEXT,
+                        emplacement             TEXT,
                         FOREIGN KEY(croisement) REFERENCES CROISEMENTS(identifiant),
                         FOREIGN KEY(croisement) REFERENCES CROISEMENTS(identifiant))''')
     conn.commit()
@@ -40,38 +41,49 @@ def connectBase():
         return False
 
 #Ajouter un nouvel object en controlant ses valeurs
-def addNew(identifiant,croisement,emplacement):
-    # control parameters
+def addNew(identifiant,numero,croisement,emplacement):
+    # control parameters*
+    retour = False
     msg = ''
-    if type(identifiant)     != type(0) or\
-       identifiant < 0:                                                 msg += "identifiant isn't correct. "
+    if type(identifiant)     != type('A'):                              msg += "identifiant isn't correct. "
+    if type(numero)          != type(0):                                msg += "identifiant isn't correct. "
     if type(croisement)      != type('A') or len(croisement) != 4 :     msg += "croisement  isn't correct. "
-    if type(emplacement)     != type('A') :                             msg += "emplacement isn't correct. " 
+    if type(emplacement)     != type('A') :                             msg += "emplacement isn't correct. "
+    for place in position:
+        if  emplacement == place : retour = True
+    if retour == False: msg += "emplacement isn't correct. " 
+    #if not emplacement == "en cours" and not statut == "pret" and not statut == "retour":     msg += "statut 'value' isn't correct. "
     if msg != '': return msg
     
     with connectBase() as conn:   
         c = conn.cursor()
         #Si l'objet existe deja suppression 
         rSQL = '''DELETE FROM MAISONS WHERE identifiant = '{}'
+                                           AND numero = '{}'
                                            AND croisement = '{}'
                                            AND emplacement = '{}';'''
-        c.execute(rSQL.format(identifiant,croisement, emplacement))
+        c.execute(rSQL.format(identifiant,numero,croisement,emplacement))
         #Ajouter le Nouvel object
-        rSQL = '''INSERT INTO MAISONS (identifiant,croisement, emplacement)
-                        VALUES ('{}','{}', '{}') ; '''
+        rSQL = '''INSERT INTO MAISONS (identifiant,numero,croisement,emplacement)
+                        VALUES ('{}','{}','{}','{}') ; '''
 
-        c.execute(rSQL.format(identifiant,croisement, emplacement))
+        c.execute(rSQL.format(identifiant,numero,croisement,emplacement))
         conn.commit()
     return True
 
 #Affiche tous les objects en fonction des parametres saisie
-def printAlls(identifiant='', croisement='', emplacement=''):
+def printAlls(identifiant='',numero= '', croisement='', emplacement=''):
     conn = connectBase()
     if conn:
         c = conn.cursor()
         rSQL = " "
         if identifiant != '':
             rSQL = " WHERE identifiant = '"+identifiant+"' "
+        if numero != '':
+            if rSQL == " ":
+                rSQL = " WHERE croisement = '"+croisement+"' "
+            else:
+                rSQL += " and croisement = '"+croisement+"' "
         if croisement != '':
             if rSQL == " ":
                 rSQL = " WHERE croisement = '"+croisement+"' "
@@ -91,11 +103,11 @@ def printAlls(identifiant='', croisement='', emplacement=''):
 
 def test():
     print("ajout d'un nouveau maison")
-    print("Maison 1 :", addNew(3,'taty', 'on'))
+    print("Maison 1 :", addNew('3',2,'taty', '4,5'))
     print("ajout d'un nouveau maison")
-    print("Maison 2 :", addNew(5,'mimo', 'on'))
+    print("Maison 2 :", addNew('5',7,'mimo', '2,1'))
     print("ajout d'un nouveau maison")
-    print("Maison 3 :", addNew(2,'mimo', 'off'))
+    print("Maison 3 :", addNew('2',1,'mimo', '3,1'))
 
     print("liste des objects")
     for fc in printAlls():
