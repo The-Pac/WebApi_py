@@ -16,8 +16,7 @@ def createBase():
     c.execute('''CREATE TABLE CROISEMENTS (
                         id              INTEGER PRIMARY KEY AUTOINCREMENT,
                         identifiant     INTEGER,
-                        x               INTERGER,
-                        y               INTERGER 
+                        position        INTEGER 
                         )''')
     conn.commit()
     print ("Table created successfully");
@@ -37,51 +36,44 @@ def connectBase():
         return False
 
 #Ajouter un nouvel object en controlant ses valeurs
-def addNew(identifiant,nom,statut):
+def addNew(identifiant,position):
     # control parameters
     msg = ''
-    if type(identifiant)       != type(0) or\
-       identifiant < 0:                                 msg += "identifiant not correct. "
-    if type(nom)            != type('A') :              msg += "nom  isn't correct. "
-    if type(statut)         != type('A') :              msg += "statut 'type' isn't correct. " 
-    if not statut == "on" and not statut == "off" :     msg += "statut 'value' isn't correct. "
+    if type(identifiant)      != type('A') :                          msg += "identifiant not correct. "
+    if type(position)         != type('A') or len(position) != 3 :    msg += "position 'type' isn't correct. " 
+    #if not type(position) == "on" and not position == "off" :     msg += "position 'value' isn't correct. "
     if msg != '': return msg
     
     with connectBase() as conn:   
         c = conn.cursor()
         #Si l'objet existe deja suppression 
-        rSQL = '''DELETE FROM ROBOTS WHERE identifiant = '{}'
-                                           AND nom = '{}'
-                                           AND statut = '{}';'''
-        c.execute(rSQL.format(identifiant,nom, statut))
+        rSQL = '''DELETE FROM CROISEMENTS WHERE identifiant = '{}'
+                                           AND position = '{}';'''
+        c.execute(rSQL.format(identifiant, position))
         #Ajouter le Nouvel object
-        rSQL = '''INSERT INTO ROBOTS (identifiant,nom, statut)
-                        VALUES ('{}','{}', '{}') ; '''
+        rSQL = '''INSERT INTO CROISEMENTS (identifiant, position)
+                        VALUES ('{}', '{}') ; '''
 
-        c.execute(rSQL.format(identifiant,nom, statut))
+        c.execute(rSQL.format(identifiant,position))
         conn.commit()
     return True
 
 #Affiche tous les objects en fonction des parametres saisie
-def printAlls(identifiant='', nom='', statut=''):
+def printAlls(identifiant='', position=''):
     conn = connectBase()
     if conn:
         c = conn.cursor()
         rSQL = " "
         if identifiant != '':
             rSQL = " WHERE identifiant = '"+identifiant+"' "
-        if nom != '':
+        
+        if position != '':
             if rSQL == " ":
-                rSQL = " WHERE nom = '"+nom+"' "
+                rSQL = " WHERE position = '"+position+"' "
             else:
-                rSQL += " and nom = '"+nom+"' "
-        if statut != '':
-            if rSQL == " ":
-                rSQL = " WHERE statut = '"+statut+"' "
-            else:
-                rSQL += " and statut = '"+statut+"' "
+                rSQL += " and position = '"+position+"' "
             
-        rSQL = '''SELECT * from ROBOTS ''' + rSQL
+        rSQL = '''SELECT * from CROISEMENTS ''' + rSQL
         c.execute(rSQL)
         rows = c.fetchall()
         for row in rows:
@@ -89,20 +81,20 @@ def printAlls(identifiant='', nom='', statut=''):
 
 def test():
     print("ajout d'un nouveau robot")
-    print("Robot 1 :", addNew(3,'taty', 'on'))
+    print("Croisement 1 :", addNew('3','4,5'))
     print("ajout d'un nouveau robot")
-    print("Robot 2 :", addNew(5,'mimo', 'on'))
+    print("Croisement 2 :", addNew('2','2,1'))
     print("ajout d'un nouveau robot")
-    print("Robot 3 :", addNew(2,'mimo', 'off'))
+    print("Croisement 3 :", addNew('2','4,2'))
 
-    print("liste des robots")
+    print("liste des objets")
     for fc in printAlls():
-        print('Robot : ', fc)
+        print('Croisement : ', fc)
     print("")
 
-    print("liste des robots nommés 'mimo'")
-    for fc in printAlls(nom='mimo'):
-        print('Robot : ', fc)    
+    print("liste des objets nommés '2'")
+    for fc in printAlls(identifiant='2'):
+        print('Croisement : ', fc)    
     print("")
 
 if __name__ == '__main__':

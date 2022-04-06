@@ -15,11 +15,11 @@ def createBase():
     
     c = conn.cursor()
     c.execute('''CREATE TABLE PAQUETS (
-                        id        INTEGER PRIMARY KEY AUTOINCREMENT,
-                        identifiant  INTEGER,
-                        destination     TEXT NOT NULL,
-                        arrivee         TEXT  
-                        )''')
+                        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+                        identifiant     TEXT,
+                        maison          TEXT,
+                        arrivee         TEXT,  
+                        FOREIGN KEY(maison) REFERENCES MAISONS(identifiant))''')
     conn.commit()
     print ("Table created successfully");
     return conn
@@ -38,15 +38,15 @@ def connectBase():
         return False
 
 #Ajouter un nouvel object en controlant ses valeurs
-def addNew(identifiant,destination):
+def addNew(identifiant,maison):
     date_Actual = str(datetime.datetime.now().strftime("%Y%m%d %H:%M:%S"))
     print(date_Actual)
     # control parameters
     msg = ''
     if type(identifiant)       != type(0) or\
        identifiant < 0:                                    msg += "identifiant not correct. "
-    if type(destination) != type('A') : 
-        msg += "destination  isn't correct. "
+    if type(maison) != type('A') : 
+        msg += "maison  isn't correct. "
     arrivee = controlDate(date_Actual)
     if arrivee == False:
         msg += "Arrivee isn't correct. "
@@ -56,13 +56,13 @@ def addNew(identifiant,destination):
     with connectBase() as conn:   
         c = conn.cursor()
         #Si l'objet existe deja suppression 
-        rSQL = '''DELETE FROM PAQUETS WHERE identifiant = '{}' AND destination = '{}' AND arrivee = '{}';'''
-        c.execute(rSQL.format(identifiant,destination,arrivee))
+        rSQL = '''DELETE FROM PAQUETS WHERE identifiant = '{}' AND maison = '{}' AND arrivee = '{}';'''
+        c.execute(rSQL.format(identifiant,maison,arrivee))
         #Ajouter le Nouvel object
-        rSQL = '''INSERT INTO PAQUETS (identifiant,destination,arrivee)
+        rSQL = '''INSERT INTO PAQUETS (identifiant,maison,arrivee)
                         VALUES ('{}', '{}', '{}') ; '''
 
-        c.execute(rSQL.format(identifiant,destination,arrivee))
+        c.execute(rSQL.format(identifiant,maison,arrivee))
         conn.commit()
     return True
 
@@ -95,18 +95,18 @@ def addDays(dateActual,diff):
 
 
 #Affiche tous les objects en fonction des parametres saisie
-def printAlls(identifiant='', destination='', arrivee=''):
+def printAlls(identifiant='', maison='', arrivee=''):
     conn = connectBase()
     if conn:
         c = conn.cursor()
         rSQL = " "
         if identifiant != '':
             rSQL = " WHERE identifiant = '"+identifiant+"' "
-        if destination != '':
+        if maison != '':
             if rSQL == " ":
-                rSQL = " WHERE destination = '"+destination+"' "
+                rSQL = " WHERE maison = '"+maison+"' "
             else:
-                rSQL += " and destination = '"+destination+"' "
+                rSQL += " and maison = '"+maison+"' "
         if arrivee != '':
             if rSQL == " ":
                 rSQL = " WHERE arrivee = '"+arrivee+"' "
@@ -116,9 +116,8 @@ def printAlls(identifiant='', destination='', arrivee=''):
         rSQL = '''SELECT * from PAQUETS ''' + rSQL
         c.execute(rSQL)
         rows = c.fetchall()
-        for _id,_identifiant,_destination,_arrivee in rows:
-            yield  _id,_identifiant,_destination,_arrivee 
-        conn.close()
+        for row in rows:
+            yield row
 
 def test():
     print("ajout d'un nouveau paquet")
@@ -134,7 +133,7 @@ def test():
     print("")
 
     print("liste des objects nommé 'tito'")
-    for fc in printAlls(destination="tito"):
+    for fc in printAlls(maison="tito"):
         print('..', fc)    
     print("")
 

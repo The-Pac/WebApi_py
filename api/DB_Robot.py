@@ -14,10 +14,10 @@ def createBase():
     
     c = conn.cursor()
     c.execute('''CREATE TABLE ROBOTS (
-                        id        INTEGER PRIMARY KEY AUTOINCREMENT,
-                        identifiant  INTEGER,
-                        nom       TEXT NOT NULL,
-                        statut    TEXT NOT NULL
+                        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+                        identifiant     TEXT,
+                        nom             TEXT NOT NULL,
+                        statut          TEXT NOT NULL
                         )''')
     conn.commit()
     print ("Table created successfully");
@@ -40,11 +40,10 @@ def connectBase():
 def addNew(identifiant,nom,statut):
     # control parameters
     msg = ''
-    if type(identifiant)       != type(0) or\
-       identifiant < 0:                                 msg += "identifiant not correct. "
+    if type(identifiant)    != type('A') :              msg += "identifiant not correct. "
     if type(nom)            != type('A') :              msg += "nom  isn't correct. "
     if type(statut)         != type('A') :              msg += "statut 'type' isn't correct. " 
-    if not statut == "on" and not statut == "off" :     msg += "statut 'value' isn't correct. "
+    if not statut == "en cours" and not statut == "pret" and not statut == "retour":     msg += "statut 'value' isn't correct. "
     if msg != '': return msg
     
     with connectBase() as conn:   
@@ -89,11 +88,11 @@ def printAlls(identifiant='', nom='', statut=''):
 
 def test():
     print("ajout d'un nouveau robot")
-    print("Robot 1 :", addNew(3,'taty', 'on'))
+    print("Robot 1 :", addNew('3','taty', 'en cours'))
     print("ajout d'un nouveau robot")
-    print("Robot 2 :", addNew(5,'mimo', 'on'))
+    print("Robot 2 :", addNew('5','mimo', 'pret'))
     print("ajout d'un nouveau robot")
-    print("Robot 3 :", addNew(2,'mimo', 'off'))
+    print("Robot 3 :", addNew('2','mimo', 'retour'))
 
     print("liste des objects")
     for fc in printAlls():

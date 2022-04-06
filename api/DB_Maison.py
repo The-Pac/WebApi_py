@@ -16,9 +16,11 @@ def createBase():
     c = conn.cursor()
     c.execute('''CREATE TABLE MAISONS (
                         id        INTEGER PRIMARY KEY AUTOINCREMENT,
-                        identifiant  INTEGER,
-                        croisement       INTERGER,
-                        emplacement      TEXT
+                        identifiant      INTEGER,
+                        numero
+                        croisement       INTEGER,
+                        emplacement      TEXT,
+                        FOREIGN KEY(croisement) REFERENCES CROISEMENTS(identifiant),
                         FOREIGN KEY(croisement) REFERENCES CROISEMENTS(identifiant))''')
     conn.commit()
     print ("Table created successfully");

@@ -16,10 +16,10 @@ def createBase():
     c = conn.cursor()
     c.execute('''CREATE TABLE LIVRAISONS (
                         id              INTEGER PRIMARY KEY AUTOINCREMENT,
-                        identifiant     INTEGER,
-                        paquet          INTEGER,
+                        identifiant     TEXT,
+                        paquet          TEXT,
                         statut          TEXT,
-                        robot           INTERGER,
+                        robot           TEXT,
                         dateheure       TEXT,
                         FOREIGN KEY(paquet) REFERENCES PAQUETS(identifiant))''')
     conn.commit()
