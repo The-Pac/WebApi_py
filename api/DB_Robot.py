@@ -84,9 +84,12 @@ def printAlls(identifiant='', nom='', statut=''):
         rSQL = '''SELECT * from ROBOTS ''' + rSQL
         c.execute(rSQL)
         rows = c.fetchall()
-        for _id,_identifiant,_nom,_statut in rows:
-            yield  _id,_identifiant,_nom,_statut 
-        conn.close()
+        print('Rows: ',rows)
+        for row in rows:
+            yield row
+        #for _id,_identifiant,_nom,_statut in rows:
+        #    yield  _id,_identifiant,_nom,_statut 
+        #conn.close()
 
 def test():
     print("ajout d'un nouveau robot")
