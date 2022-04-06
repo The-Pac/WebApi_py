@@ -21,17 +21,3 @@ appDrop.include_router(Maison.app)
 appDrop.include_router(Paquet.app)
 appDrop.include_router(Robot.app)
 
-
-#Les bases de donnee dont Drop_api depend
-'''
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-@appDrop.get("/")
-async def home():
-    return {"hello" : "world"}
-'''
