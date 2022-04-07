@@ -8,9 +8,8 @@ import DB_Tables
 app = APIRouter()
 
 class Robot(BaseModel):
-    identifiant : str
-    nom : str
     statut : str
+    position : str
 
 #creation de la lecture ecriture mise à jour et suppression d'elements:
 @app.get("/robots/",tags = ['Robot']) 
@@ -22,13 +21,13 @@ async def get_robots():
 
 #Reccupere le robot avec son id d'identification
 @app.get("/robots/{identifiant}",tags = ['Robot'])
-async def get_robot(identifiant: str):
+async def get_robot(identifiant:str):
     try : 
         return  {DB_Tables.printRobot(identifiant=identifiant)}
     except:
         raise HTTPException(status_code=404, detail="Object not found in DataBase")
-    
+
 #ajoute un robot
 @app.post("/robot",tags = ['Robot'])
 async def create_robot(robot: Robot):
-    return DB_Tables.addRobot(robot.identifiant,robot.nom,robot.statut)
+    return DB_Tables.addRobot(robot.statut,robot.position)

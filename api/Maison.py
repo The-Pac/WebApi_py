@@ -23,7 +23,7 @@ async def get_maisons():
         raise HTTPException(status_code=404, detail="Object not found in DataBase")
 
 #Reccupere la maison avec son id d'identification
-@app.get("/maison/{identifiant}",tags = ['Maison'])
+@app.get("/maisons/{identifiant}",tags = ['Maison'])
 async def get_maison(identifiant:int):
     try : 
         return  {DB_Tables.printMaison(identifiant=identifiant)}

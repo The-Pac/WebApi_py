@@ -20,7 +20,7 @@ async def get_croisements():
         raise HTTPException(status_code=404, detail="Object not found in DataBase")
 
 #Reccupere le croisement avec son id d'identification
-@app.get("/croisement/{identifiant}",tags = ['Croisement'])
+@app.get("/croisements/{identifiant}",tags = ['Croisement'])
 async def get_croisement(identifiant: str):
     try : 
         return  {DB_Tables.printCroisement(identifiant=identifiant)}

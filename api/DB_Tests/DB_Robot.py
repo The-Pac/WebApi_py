@@ -16,9 +16,8 @@ def createBase():
     c = conn.cursor()
     c.execute('''CREATE TABLE ROBOTS (
                         id              INTEGER PRIMARY KEY AUTOINCREMENT,
-                        identifiant     TEXT,
-                        nom             TEXT NOT NULL,
-                        statut          TEXT NOT NULL
+                        nom             TEXT ,
+                        statut          TEXT 
                         )''')
     conn.commit()
     print ("Table created successfully");
@@ -40,10 +39,12 @@ def connectBase():
         return False
 
 #Ajouter un nouvel object en controlant ses valeurs
-def addNew(identifiant,nom,statut):
+def addNew(nom, statut = ''):
     # control parameters
     msg = ''
-    if type(identifiant)    != type('A') :              msg += "identifiant not correct. "
+    if statut == '':
+        statut = 'pret'
+     
     if type(nom)            != type('A') :              msg += "nom  isn't correct. "
     if type(statut)         != type('A') :              msg += "statut 'type' isn't correct. " 
     if not statut == "en cours" and not statut == "pret" and not statut == "retour":     msg += "statut 'value' isn't correct. "
@@ -52,15 +53,13 @@ def addNew(identifiant,nom,statut):
     with connectBase() as conn:   
         c = conn.cursor()
         #Si l'objet existe deja suppression 
-        rSQL = '''DELETE FROM ROBOTS WHERE identifiant = '{}'
-                                           AND nom = '{}'
-                                           AND statut = '{}';'''
-        c.execute(rSQL.format(identifiant,nom, statut))
+        rSQL = '''DELETE FROM ROBOTS WHERE nom = '{}';'''
+        c.execute(rSQL.format(nom))
         #Ajouter le Nouvel object
-        rSQL = '''INSERT INTO ROBOTS (identifiant,nom, statut)
-                        VALUES ('{}','{}', '{}') ; '''
+        rSQL = '''INSERT INTO ROBOTS (nom, statut)
+                        VALUES ('{}', '{}') ; '''
 
-        c.execute(rSQL.format(identifiant,nom, statut))
+        c.execute(rSQL.format(nom, statut))
         conn.commit()
     return True
 
@@ -92,11 +91,11 @@ def printAlls(identifiant='', nom='', statut=''):
 
 def test():
     print("ajout d'un nouveau robot")
-    print("Robot 1 :", addNew('3','taty', 'en cours'))
+    print("Robot 1 :", addNew('taty', 'en cours'))
     print("ajout d'un nouveau robot")
-    print("Robot 2 :", addNew('5','mimo', 'pret'))
+    print("Robot 2 :", addNew('mimo'))
     print("ajout d'un nouveau robot")
-    print("Robot 3 :", addNew('2','mimo', 'retour'))
+    print("Robot 3 :", addNew('mimo', 'retour'))
 
     print("liste des objects")
     for fc in printAlls():

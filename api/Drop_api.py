@@ -13,7 +13,7 @@ import Croisement,Livraison,Maison,Paquet,Robot
 #uvicorn todo:app --reload
 
 #connection et creation a FastAPI  
-appDrop = FastAPI(title="Distribution Robotisée Opérée par la Poste",openapi_url="/192.168.1.19:8000")
+appDrop = FastAPI(title="Distribution Robotisée Opérée par la Poste")#,openapi_url="/0.0.0.0:8000"
 
 appDrop.include_router(Croisement.app)
 appDrop.include_router(Livraison.app)

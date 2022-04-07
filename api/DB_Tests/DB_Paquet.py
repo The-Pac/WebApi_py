@@ -16,8 +16,7 @@ def createBase():
     c = conn.cursor()
     c.execute('''CREATE TABLE PAQUETS (
                         id              INTEGER PRIMARY KEY AUTOINCREMENT,
-                        identifiant     TEXT,
-                        maison          TEXT,
+                        maison          INTEGER AUTOINCREMENT,
                         arrivee         TEXT,  
                         FOREIGN KEY(maison) REFERENCES MAISONS(identifiant))''')
     conn.commit()
@@ -40,13 +39,11 @@ def connectBase():
         return False
 
 #Ajouter un nouvel object en controlant ses valeurs
-def addNew(identifiant,maison):
+def addNew(maison):
     date_Actual = str(datetime.datetime.now().strftime("%Y%m%d %H:%M:%S"))
     print(date_Actual)
     # control parameters
     msg = ''
-    if type(identifiant)       != type(0) or\
-       identifiant < 0:                                    msg += "identifiant not correct. "
     if type(maison) != type('A') : 
         msg += "maison  isn't correct. "
     arrivee = controlDate(date_Actual)
@@ -58,13 +55,13 @@ def addNew(identifiant,maison):
     with connectBase() as conn:   
         c = conn.cursor()
         #Si l'objet existe deja suppression 
-        rSQL = '''DELETE FROM PAQUETS WHERE identifiant = '{}' AND maison = '{}' AND arrivee = '{}';'''
-        c.execute(rSQL.format(identifiant,maison,arrivee))
+        rSQL = '''DELETE FROM PAQUETS WHERE maison = '{}';'''
+        c.execute(rSQL.format(maison))
         #Ajouter le Nouvel object
-        rSQL = '''INSERT INTO PAQUETS (identifiant,maison,arrivee)
-                        VALUES ('{}', '{}', '{}') ; '''
+        rSQL = '''INSERT INTO PAQUETS (maison,arrivee)
+                        VALUES ('{}', '{}') ; '''
 
-        c.execute(rSQL.format(identifiant,maison,arrivee))
+        c.execute(rSQL.format(maison,arrivee))
         conn.commit()
     return True
 
@@ -97,18 +94,13 @@ def addDays(dateActual,diff):
 
 
 #Affiche tous les objects en fonction des parametres saisie
-def printAlls(identifiant='', maison='', arrivee=''):
+def printAlls(maison='', arrivee=''):
     conn = connectBase()
     if conn:
         c = conn.cursor()
         rSQL = " "
-        if identifiant != '':
-            rSQL = " WHERE identifiant = '"+identifiant+"' "
         if maison != '':
-            if rSQL == " ":
-                rSQL = " WHERE maison = '"+maison+"' "
-            else:
-                rSQL += " and maison = '"+maison+"' "
+            rSQL = " WHERE maison = '"+maison+"' "
         '''
         if arrivee != '':
             if rSQL == " ":
@@ -124,11 +116,11 @@ def printAlls(identifiant='', maison='', arrivee=''):
 
 def test():
     print("ajout d'un nouveau paquet")
-    print("Paquet 1 :", addNew(3,'taty'))
+    print("Paquet 1 :", addNew('tatu'))
     print("ajout d'un nouveau paquet")
-    print("Paquet 2 :", addNew(6,'tito'))
+    print("Paquet 2 :", addNew('tit'))
     print("ajout d'un nouveau paquet")
-    print("Paquet 3 :", addNew(4,'tito'))
+    print("Paquet 3 :", addNew('titu'))
 
     print("liste des objects")
     for fc in printAlls():
