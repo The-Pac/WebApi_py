@@ -7,11 +7,11 @@
  * REMARQUE : le port UART est ouvert le temps de donner l'adresse IP du serveur.
  */
 
+
 #include <WiFi.h>
 #include <WiFiServer.h>
 #include <WiFiClient.h>
 #include <HTTPClient.h>
-
 
 //######################################
 //##                                  ##
@@ -46,13 +46,6 @@ const char *ssid     = "IMERIR_IoT";
 const char *password = "kohWoong5oox";
 String demande_client;
 
-//URL de l'API
-String serverName = "http://10.3.1.235:8000";
-
-//mesure de temps
-unsigned long lastTime = 0;
-//Intervalle de 5 seconde
-unsigned long timerDelay = 5000;
 
 
 
@@ -178,26 +171,24 @@ void loop()
    * DEPLACEMENT DE LA VOITURE
    * 
    */
-    char tab_position[100] = {'A','A','D','A','I','D','D','A','G'};
-    //
+    char tab_position[] = {'A','A','D','D','G'};
 
 
    ///////////
     int i = 0;
-   while (i<6 )
+   while (i<5 )
       {
         //DEPLACEMENT JUSQUA ARRIVE if
-          if ((digitalRead(C2) == 1 || digitalRead(C3) == 1 ) && digitalRead(C1) == 1 && digitalRead(C4) == 1){
-            if(tab_position[i] == 'A'){
-            
-          Serial.println("cav");
+
+          if(tab_position[i] == 'A'){
+            Serial.println("cav");
             DAvant();
             i ++;
           }
           else if(tab_position[i] == 'G'){ // tourner à gauche à l'intersection
-          Serial.println("cga");
             
             DStop();
+            Serial.println("cg");
             delay(3000);
             
             DAvant();
@@ -210,8 +201,8 @@ void loop()
            delay(3000);
           }
           else if (tab_position[i] == 'D') { // tourner à droite à l'intersection
-          Serial.println("cdr");
             DStop();
+            Serial.println("cdr");
             delay(3000);
             
             DAvant();
@@ -226,31 +217,24 @@ void loop()
           else if(tab_position[i] == 'R'){
             DArriere();
             i ++;
-          }else if(tab_position[i] == 'I'){
+          }
             
-          Serial.println("cst");
-            DStop();
-            delay(1000);
-            i ++;
-          }
-          }
 
         ///////////////////////////////////////////////////////
         // AVANCER
         else if ((digitalRead(C2) == 1 || digitalRead(C3) == 1 ) && digitalRead(C1) == 0 && digitalRead(C4) == 0){
-          Serial.println("av");
           DAvant();
+          Serial.println("av");
         }
 
         // CORRECTION DE LIGNE
         else if ( digitalRead(C1) == 1 && digitalRead(C4) == 0){
-          Serial.println("dr");
           DDroit();
+            Serial.println("dr");
         }
         else if ( digitalRead(C1) == 0 && digitalRead(C4) == 1){
-          
-          Serial.println("ga");
           DGauche();
+            Serial.println("dr");
         }
         //////////////////////////////////////////////////////
 
