@@ -4,7 +4,7 @@ from datetime import datetime
 from pathlib import Path
 from sqlite3 import Error
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 
 drop_db = "DROP.db"
 app = APIRouter()
@@ -77,6 +77,7 @@ def createBase():
 def connectBase():
     try:
         file = Path(drop_db)
+        print(drop_db)
         if file.exists():
             conn = sqlite3.connect(drop_db)
             conn.row_factory = lambda c, r: dict([(col[0], r[idx]) for idx, col in enumerate(c.description)])
@@ -89,165 +90,6 @@ def connectBase():
 
 
 # SELECT GET
-
-# get all robots
-@app.get("/robots/", tags=['Robot'])
-async def get_robots():
-    try:
-        with connectBase() as conn:
-            c = conn.cursor()
-
-            rSQL = '''SELECT * from ROBOTS '''
-            c.execute(rSQL)
-            rows = c.fetchall()
-            for row in rows:
-                yield row
-    except:
-        raise HTTPException(status_code=404, detail="Object not found in DataBase")
-
-
-# get robot with his id
-@app.get("/robots/{id_robot}", tags=['Robot'])
-async def get_robot(id_robot: int):
-    try:
-        with connectBase() as conn:
-            c = conn.cursor()
-            rSQL = " "
-            if id_robot != '':
-                rSQL = " WHERE id_robot = '" + id_robot + "' "
-
-            rSQL = '''SELECT * from ROBOTS ''' + rSQL
-            c.execute(rSQL)
-            return c.fetchone()
-    except:
-        raise HTTPException(status_code=404, detail="Object not found in DataBase")
-
-
-# get all intersections
-@app.get("/croisements/", tags=['Croisement'], response_model_exclude=id)
-async def get_croisements():
-    try:
-        with connectBase() as conn:
-            c = conn.cursor()
-            rSQL = '''SELECT * from CROISEMENTS '''
-            c.execute(rSQL)
-            rows = c.fetchall()
-            for row in rows:
-                yield row
-    except:
-        raise HTTPException(status_code=404, detail="Object not found in DataBase")
-
-
-# get intersection with his id
-@app.get("/croisements/{id_croisement}", tags=['Croisement'])
-async def get_croisement(id_croisement: int):
-    try:
-        with connectBase() as conn:
-            c = conn.cursor()
-            if id_croisement != '':
-                rSQL = " WHERE id_croisement = '" + id_croisement + "' "
-
-            rSQL = '''SELECT * from CROISEMENTS ''' + rSQL
-            c.execute(rSQL)
-            return c.fetchone()
-    except:
-        raise HTTPException(status_code=404, detail="Object not found in DataBase")
-
-
-# get all deliveries
-@app.get("/livraisons/", tags=['Livraison'])
-async def get_livraisons():
-    try:
-        with connectBase() as conn:
-            c = conn.cursor()
-
-            rSQL = '''SELECT * from LIVRAISONS '''
-            c.execute(rSQL)
-            rows = c.fetchall()
-            for row in rows:
-                yield row
-    except:
-        raise HTTPException(status_code=404, detail="Object not found in DataBase")
-
-
-# get delivery with his id
-@app.get("/livraison/{id_livraison}", tags=['Livraison'])
-async def get_livraison(id_livraison: str):
-    try:
-        with connectBase() as conn:
-            c = conn.cursor()
-            if id_livraison != '':
-                rSQL = " WHERE identifiant = '" + id_livraison + "' "
-
-            rSQL = '''SELECT * from LIVRAISONS ''' + rSQL
-            c.execute(rSQL)
-            return c.fetchone()
-    except:
-        raise HTTPException(status_code=404, detail="Object not found in DataBase")
-
-
-# get all houses
-@app.get("/maisons/", tags=['Maison'])
-async def get_maisons():
-    try:
-        with connectBase() as conn:
-            c = conn.cursor()
-
-            rSQL = '''SELECT * from MAISONS '''
-            c.execute(rSQL)
-            rows = c.fetchall()
-            for row in rows:
-                yield row
-    except:
-        raise HTTPException(status_code=404, detail="Object not found in DataBase")
-
-
-# get house with his id
-@app.get("/maisons/{id_maison}", tags=['Maison'])
-async def get_maison(id_maison: int):
-    try:
-        with connectBase() as conn:
-            c = conn.cursor()
-            if id_maison != '':
-                rSQL = " WHERE id_maison = '" + id_maison + "' "
-
-            rSQL = '''SELECT * from MAISONS ''' + rSQL
-            c.execute(rSQL)
-            return c.fetchone()
-    except:
-        raise HTTPException(status_code=404, detail="Object not found in DataBase")
-
-
-# get all packages
-@app.get("/paquets/", tags=['Paquet'])
-async def get_paquets():
-    try:
-        with connectBase() as conn:
-            c = conn.cursor()
-
-            rSQL = '''SELECT * from PAQUETS '''
-            c.execute(rSQL)
-            rows = c.fetchall()
-            for row in rows:
-                yield row
-    except:
-        raise HTTPException(status_code=404, detail="Object not found in DataBase")
-
-
-# get package with his id
-@app.get("/paquets/{id_paquet}", tags=['Paquet'])
-async def get_paquet(id_paquet: int):
-    try:
-        with connectBase() as conn:
-            c = conn.cursor()
-            if id_paquet != '':
-                rSQL = " WHERE identifiant = '" + id_paquet + "' "
-
-            rSQL = '''SELECT * from PAQUETS ''' + rSQL
-            c.execute(rSQL)
-            return c.fetchone()
-    except:
-        raise HTTPException(status_code=404, detail="Object not found in DataBase")
 
 
 ##################################################
@@ -262,6 +104,16 @@ def insertRobot(identifiant, statut):
         rSQL = '''INSERT INTO ROBOTS (identifiant,statut)
                         VALUES ('{}','{}') ; '''
         c.execute(rSQL.format(identifiant, statut))
+        conn.commit()
+
+
+def insertLivraison(id_paquet, statut):
+    with connectBase() as conn:
+        c = conn.cursor()
+        # Ajouter le Nouvel object
+        rSQL = '''INSERT INTO LIVRAISONS (id_paquet,statut)
+                        VALUES ('{}','{}') ; '''
+        c.execute(rSQL.format(id_paquet, statut))
         conn.commit()
 
 
@@ -281,14 +133,6 @@ def insertPaquet(identifiant, id_maison):
 
         c.execute(rSQL.format(id_maison, date_arriver, identifiant))
         statut = "a livrer"
-
-        # TODO changer le update
-        c = conn.cursor()
-        # Ajouter le Nouvel object
-        rSQL = '''UPDATE LIVRAISONS SET statut = '{}' WHERE id_paquet = '{}'; '''
-
-        c.execute(rSQL.format(statut, c.fetchone()))
-        conn.commit()
 
 
 def insertCroisement(identifiant, x, y):
@@ -330,7 +174,6 @@ def updateRobot(identifiant, statut, x, y):
                         VALUES ('{}','{}','{}','{}') ; '''
         c.execute(rSQL.format(identifiant, statut, x, y))
         conn.commit()
-    return True
 
 
 def updatePaquet(identifiant, id_maison):
@@ -348,9 +191,9 @@ def updatePaquet(identifiant, id_maison):
         rSQL = '''SELECT id_paquet FROM PAQUETS  WHERE id_maison = '{}' AND date_arriver = '{}' AND identifiant= '{}'; '''
 
         c.execute(rSQL.format(id_maison, date_arriver, identifiant))
-        updateLivraison(c.fetchall())
 
-    return True
+        # generate a delivery
+        updateLivraison(c.fetchall())
 
 
 def updateCroisement(identifiant, position, x, y):
@@ -362,18 +205,16 @@ def updateCroisement(identifiant, position, x, y):
 
         c.execute(rSQL.format(identifiant, position, x, y))
         conn.commit()
-    return True
 
 
-def updateMaison(numero, id_croisement, x, y):
+def updateMaison(numero, id_croisement):
     with connectBase() as conn:
         c = conn.cursor()
-        rSQL = '''INSERT INTO MAISONS (numero,id_croisement,x,y)
-                        VALUES ('{}','{}','{}','{}') ; '''
+        rSQL = '''INSERT INTO MAISONS (numero,id_croisement)
+                        VALUES ('{}','{}') ; '''
 
-        c.execute(rSQL.format(numero, id_croisement, x, y))
+        c.execute(rSQL.format(numero, id_croisement))
         conn.commit()
-    return True
 
 
 def updateLivraison(id_paquet):
@@ -381,145 +222,119 @@ def updateLivraison(id_paquet):
     with connectBase() as conn:
         c = conn.cursor()
         # Ajouter le Nouvel object
-        rSQL = '''INSERT INTO ROBOTS (id_paquet,statut)
-                        VALUES ('{}', '{}') ; '''
+        rSQL = '''UPDATE LIVRAISONS SET statut = '{}' WHERE id_paquet = '{}'; '''
 
-        c.execute(rSQL.format(id_paquet, statut))
+        c.execute(rSQL.format(statut, id_paquet))
         conn.commit()
-    return True
 
 
 # SELECT
 
-def selectRobot(identifiant='', nom='', statut=''):
+def selectRobot(id_robot):
     with connectBase() as conn:
         c = conn.cursor()
         rSQL = " "
-        if identifiant != '':
-            rSQL = " WHERE identifiant = '" + identifiant + "' "
-        if nom != '':
-            if rSQL == " ":
-                rSQL = " WHERE nom = '" + nom + "' "
-            else:
-                rSQL += " and nom = '" + nom + "' "
-        if statut != '':
-            if rSQL == " ":
-                rSQL = " WHERE statut = '" + statut + "' "
-            else:
-                rSQL += " and statut = '" + statut + "' "
+        if id_robot != '':
+            rSQL = " WHERE id_robot = '" + id_robot + "' "
 
         rSQL = '''SELECT * from ROBOTS ''' + rSQL
+        c.execute(rSQL)
+        return c.fetchone()
+
+
+def selectRobots():
+    with connectBase() as conn:
+        c = conn.cursor()
+
+        rSQL = '''SELECT * from ROBOTS '''
         c.execute(rSQL)
         rows = c.fetchall()
         for row in rows:
             yield row
 
 
-def selectPaquet(identifiant='', maison='', arrivee=''):
+def selectPaquet(id_paquet):
     with connectBase() as conn:
         c = conn.cursor()
-        rSQL = " "
-        if identifiant != '':
-            rSQL = " WHERE identifiant = '" + identifiant + "' "
-        if maison != '':
-            if rSQL == " ":
-                rSQL = " WHERE maison = '" + maison + "' "
-            else:
-                rSQL += " and maison = '" + maison + "' "
-        if arrivee != '':
-            if rSQL == " ":
-                rSQL = " WHERE arrivee = '" + arrivee + "' "
-            else:
-                rSQL += " and arrivee = '" + arrivee + "' "
+        if id_paquet != '':
+            rSQL = " WHERE identifiant = '" + id_paquet + "' "
 
         rSQL = '''SELECT * from PAQUETS ''' + rSQL
         c.execute(rSQL)
+        return c.fetchone()
+
+
+def selectPaquets():
+    selectPaquets()
+    with connectBase() as conn:
+        c = conn.cursor()
+
+        rSQL = '''SELECT * from PAQUETS '''
+        c.execute(rSQL)
         rows = c.fetchall()
         for row in rows:
             yield row
 
 
-def selectCroisement(identifiant='', position='', x='', y=''):
+def selectCroisement(id_croisement):
     with connectBase() as conn:
         c = conn.cursor()
-        rSQL = " "
-        if identifiant != '':
-            rSQL = " WHERE identifiant = '" + identifiant + "' "
-        if position != '':
-            if rSQL == " ":
-                rSQL = " WHERE position = '" + position + "' "
-            else:
-                rSQL += " and position = '" + position + "' "
-        if x != '':
-            if rSQL == " ":
-                rSQL = " WHERE x = '" + x + "' "
-            else:
-                rSQL += " and x = '" + x + "' "
-        if y != '':
-            if rSQL == " ":
-                rSQL = " WHERE y = '" + y + "' "
-            else:
-                rSQL += " and y = '" + y + "' "
+        if id_croisement != '':
+            rSQL = " WHERE id_croisement = '" + id_croisement + "' "
 
         rSQL = '''SELECT * from CROISEMENTS ''' + rSQL
         c.execute(rSQL)
-        rows = c.fetchall()
-        for row in rows:
-            yield row
+        return c.fetchone()
 
 
-def selectMaison(identifiant='', numero='', croisement='', emplacement=''):
+def selectCroisements():
     with connectBase() as conn:
         c = conn.cursor()
-        rSQL = " "
-        if identifiant != '':
-            rSQL = " WHERE identifiant = '" + identifiant + "' "
-        if numero != '':
-            if rSQL == " ":
-                rSQL = " WHERE croisement = '" + croisement + "' "
-            else:
-                rSQL += " and croisement = '" + croisement + "' "
-        if croisement != '':
-            if rSQL == " ":
-                rSQL = " WHERE croisement = '" + croisement + "' "
-            else:
-                rSQL += " and croisement = '" + croisement + "' "
-        if emplacement != '':
-            if rSQL == " ":
-                rSQL = " WHERE emplacement = '" + emplacement + "' "
-            else:
-                rSQL += " and emplacement = '" + emplacement + "' "
-
-        rSQL = '''SELECT * from MAISONS ''' + rSQL
+        rSQL = '''SELECT * from CROISEMENTS '''
         c.execute(rSQL)
         rows = c.fetchall()
         for row in rows:
             yield row
 
 
-def selectLivraison(identifiant='', paquet='', statut='', robot=''):
+def selectMaison(id_maison):
     with connectBase() as conn:
         c = conn.cursor()
-        rSQL = " "
-        if identifiant != '':
-            rSQL = " WHERE identifiant = '" + identifiant + "' "
-        if paquet != '':
-            if rSQL == " ":
-                rSQL = " WHERE paquet = '" + paquet + "' "
-            else:
-                rSQL += " and paquet = '" + paquet + "' "
-        if statut != '':
-            if rSQL == " ":
-                rSQL = " WHERE statut = '" + statut + "' "
-            else:
-                rSQL += " and statut = '" + statut + "' "
-        if robot != '':
-            if rSQL == " ":
-                rSQL = " WHERE robot = '" + robot + "' "
-            else:
-                rSQL += " and robot = '" + robot + "' "
+        if id_maison != '':
+            rSQL = " WHERE id_maison = '" + id_maison + "' "
 
-        rSQL = '''SELECT * from ROBOTS ''' + rSQL
+        rSQL = '''SELECT * from MAISONS ''' + rSQL
+        c.execute(rSQL)
+        return c.fetchone()
+
+
+def selectMaisons():
+    with connectBase() as conn:
+        c = conn.cursor()
+
+        rSQL = '''SELECT * from MAISONS '''
+        c.execute(rSQL)
+        rows = c.fetchall()
+        for row in rows:
+            yield row
+
+
+def selectLivraison(id_livraison):
+    with connectBase() as conn:
+        c = conn.cursor()
+        if id_livraison != '':
+            rSQL = " WHERE identifiant = '" + id_livraison + "' "
+
+        rSQL = '''SELECT * from LIVRAISONS ''' + rSQL
+        c.execute(rSQL)
+        return c.fetchone()
+
+
+def selectLivraisons():
+    with connectBase() as conn:
+        c = conn.cursor()
+
+        rSQL = '''SELECT * from LIVRAISONS '''
         c.execute(rSQL)
         rows = c.fetchall()
         for row in rows:
