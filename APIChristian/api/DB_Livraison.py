@@ -52,11 +52,6 @@ def addNew(identifiant,nom,statut):
     
     with connectBase() as conn:   
         c = conn.cursor()
-        #Si l'objet existe deja suppression 
-        rSQL = '''DELETE FROM ROBOTS WHERE identifiant = '{}'
-                                           AND nom = '{}'
-                                           AND statut = '{}';'''
-        c.execute(rSQL.format(identifiant,nom, statut))
         #Ajouter le Nouvel object
         rSQL = '''INSERT INTO ROBOTS (identifiant,nom, statut)
                         VALUES ('{}','{}', '{}') ; '''

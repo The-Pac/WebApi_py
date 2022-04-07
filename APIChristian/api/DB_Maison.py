@@ -51,11 +51,6 @@ def addNew(identifiant,croisement,emplacement):
     
     with connectBase() as conn:   
         c = conn.cursor()
-        #Si l'objet existe deja suppression 
-        rSQL = '''DELETE FROM MAISONS WHERE identifiant = '{}'
-                                           AND croisement = '{}'
-                                           AND emplacement = '{}';'''
-        c.execute(rSQL.format(identifiant,croisement, emplacement))
         #Ajouter le Nouvel object
         rSQL = '''INSERT INTO MAISONS (identifiant,croisement, emplacement)
                         VALUES ('{}','{}', '{}') ; '''

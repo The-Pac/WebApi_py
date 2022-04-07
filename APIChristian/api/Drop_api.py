@@ -4,6 +4,8 @@
 
 import http
 from http.client import HTTPException
+
+import uvicorn as uvicorn
 from fastapi import Depends, FastAPI, HTTPException
 from typing import List, Optional
 from pydantic import BaseModel

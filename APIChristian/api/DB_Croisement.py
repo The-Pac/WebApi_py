@@ -46,10 +46,6 @@ def addNew(identifiant,position):
     
     with connectBase() as conn:   
         c = conn.cursor()
-        #Si l'objet existe deja suppression 
-        rSQL = '''DELETE FROM CROISEMENTS WHERE identifiant = '{}'
-                                           AND position = '{}';'''
-        c.execute(rSQL.format(identifiant, position))
         #Ajouter le Nouvel object
         rSQL = '''INSERT INTO CROISEMENTS (identifiant, position)
                         VALUES ('{}', '{}') ; '''

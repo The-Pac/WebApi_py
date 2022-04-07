@@ -55,9 +55,6 @@ def addNew(identifiant,maison):
     
     with connectBase() as conn:   
         c = conn.cursor()
-        #Si l'objet existe deja suppression 
-        rSQL = '''DELETE FROM PAQUETS WHERE identifiant = '{}' AND maison = '{}' AND arrivee = '{}';'''
-        c.execute(rSQL.format(identifiant,maison,arrivee))
         #Ajouter le Nouvel object
         rSQL = '''INSERT INTO PAQUETS (identifiant,maison,arrivee)
                         VALUES ('{}', '{}', '{}') ; '''

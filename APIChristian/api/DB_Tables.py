@@ -143,11 +143,6 @@ def addRobot(identifiant,nom,statut):
     
     with connectBase(dbRobot) as conn:   
         c = conn.cursor()
-        #Si l'objet existe deja suppression 
-        rSQL = '''DELETE FROM ROBOTS WHERE identifiant = '{}'
-                                           AND nom = '{}'
-                                           AND statut = '{}';'''
-        c.execute(rSQL.format(identifiant,nom, statut))
         #Ajouter le Nouvel object
         rSQL = '''INSERT INTO ROBOTS (identifiant,nom, statut)
                         VALUES ('{}','{}', '{}') ; '''
@@ -169,9 +164,6 @@ def addPaquet(identifiant,maison):
     
     with connectBase(dbPaquet) as conn:   
         c = conn.cursor()
-        #Si l'objet existe deja suppression 
-        rSQL = '''DELETE FROM PAQUETS WHERE identifiant = '{}' AND maison = '{}' AND arrivee = '{}';'''
-        c.execute(rSQL.format(identifiant,maison,arrivee))
         #Ajouter le Nouvel object
         rSQL = '''INSERT INTO PAQUETS (identifiant,maison,arrivee)
                         VALUES ('{}', '{}', '{}') ; '''
@@ -216,10 +208,6 @@ def addCroisement(identifiant,position):
     
     with connectBase(dbCroisement) as conn:   
         c = conn.cursor()
-        #Si l'objet existe deja suppression 
-        rSQL = '''DELETE FROM CROISEMENTS WHERE identifiant = '{}'
-                                           AND position = '{}';'''
-        c.execute(rSQL.format(identifiant, position))
         #Ajouter le Nouvel object
         rSQL = '''INSERT INTO CROISEMENTS (identifiant, position)
                         VALUES ('{}', '{}') ; '''
@@ -238,11 +226,6 @@ def addMaison(identifiant,croisement,emplacement):
     
     with connectBase(dbMaison) as conn:   
         c = conn.cursor()
-        #Si l'objet existe deja suppression 
-        rSQL = '''DELETE FROM MAISONS WHERE identifiant = '{}'
-                                           AND croisement = '{}'
-                                           AND emplacement = '{}';'''
-        c.execute(rSQL.format(identifiant,croisement, emplacement))
         #Ajouter le Nouvel object
         rSQL = '''INSERT INTO MAISONS (identifiant,croisement, emplacement)
                         VALUES ('{}','{}', '{}') ; '''
@@ -262,11 +245,6 @@ def addLivraison(identifiant,nom,statut):
     
     with connectBase(dbLivraison) as conn:   
         c = conn.cursor()
-        #Si l'objet existe deja suppression 
-        rSQL = '''DELETE FROM ROBOTS WHERE identifiant = '{}'
-                                           AND nom = '{}'
-                                           AND statut = '{}';'''
-        c.execute(rSQL.format(identifiant,nom, statut))
         #Ajouter le Nouvel object
         rSQL = '''INSERT INTO ROBOTS (identifiant,nom, statut)
                         VALUES ('{}','{}', '{}') ; '''
