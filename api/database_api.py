@@ -18,7 +18,7 @@ app = APIRouter()
 def createBase():
     try:
         conn = sqlite3.connect(drop_db)
-    except Error as e:
+    except Error:
         return False
 
     c = conn.cursor()
@@ -77,10 +77,10 @@ def createBase():
 def connectBase():
     try:
         file = Path(drop_db)
-        print(drop_db)
         if file.exists():
             conn = sqlite3.connect(drop_db)
-            conn.row_factory = lambda c, r: dict([(col[0], r[idx]) for idx, col in enumerate(c.description)])
+            conn.row_factory = sqlite3.Row
+            # conn.row_factory = lambda c, r: dict([(col[0], r[idx]) for idx, col in enumerate(c.description)])
             return conn
         conn = createBase()
         print("Connected successfully")
@@ -97,32 +97,27 @@ def connectBase():
 ##################################################
 
 
-def insertRobot(identifiant, statut):
+def insertRobot(identifiant, statut, x, y, number_delivery):
     with connectBase() as conn:
         c = conn.cursor()
-        # Ajouter le Nouvel object
-        rSQL = '''INSERT INTO ROBOTS (identifiant,statut)
-                        VALUES ('{}','{}') ; '''
-        c.execute(rSQL.format(identifiant, statut))
+        rSQL = '''INSERT INTO ROBOTS (identifiant,statut,x,y,number_delivery)
+                        VALUES ('{}','{}','{}','{}','{}') ; '''
+        c.execute(rSQL.format(identifiant, statut, x, y, number_delivery))
         conn.commit()
 
 
 def insertLivraison(id_paquet, statut):
     with connectBase() as conn:
         c = conn.cursor()
-        # Ajouter le Nouvel object
         rSQL = '''INSERT INTO LIVRAISONS (id_paquet,statut)
                         VALUES ('{}','{}') ; '''
         c.execute(rSQL.format(id_paquet, statut))
         conn.commit()
 
 
-def insertPaquet(identifiant, id_maison):
-    date_arriver = str(datetime.now().strftime("%Y%m%d %H:%M:%S"))
-
+def insertPaquet(identifiant, id_maison, date_arriver):
     with connectBase() as conn:
         c = conn.cursor()
-        # Ajouter le Nouvel object
         rSQL = '''INSERT INTO PAQUETS(id_maison,date_arriver,identifiant)
                                 VALUES ('{}','{}','{}') ; '''
 
@@ -132,17 +127,16 @@ def insertPaquet(identifiant, id_maison):
         rSQL = '''SELECT id_paquet FROM PAQUETS  WHERE id_maison = '{}' AND date_arriver = '{}' AND identifiant= '{}'; '''
 
         c.execute(rSQL.format(id_maison, date_arriver, identifiant))
-        statut = "a livrer"
+        return c.fetchone()
 
 
-def insertCroisement(identifiant, x, y):
+def insertCroisement(x, y):
     with connectBase() as conn:
         c = conn.cursor()
-        # Ajouter le Nouvel object
-        rSQL = '''INSERT INTO CROISEMENTS (identifiant,x,y)
-                        VALUES ('{}', '{}', '{}') ; '''
+        rSQL = '''INSERT INTO CROISEMENTS (x,y)
+                        VALUES ('{}', '{}') ; '''
 
-        c.execute(rSQL.format(identifiant, x, y))
+        c.execute(rSQL.format(x, y))
         conn.commit()
 
 
@@ -169,7 +163,6 @@ def updateRobot(identifiant, statut, x, y):
 
     with connectBase() as conn:
         c = conn.cursor()
-        # Ajouter le Nouvel object
         rSQL = '''INSERT INTO ROBOTS (identifiant,statut,x,y)
                         VALUES ('{}','{}','{}','{}') ; '''
         c.execute(rSQL.format(identifiant, statut, x, y))
@@ -181,29 +174,22 @@ def updatePaquet(identifiant, id_maison):
 
     with connectBase() as conn:
         c = conn.cursor()
-        # Ajouter le Nouvel object
         rSQL = '''INSERT INTO PAQUETS(id_maison,date_arriver,identifiant)
                         VALUES ('{}','{}','{}') ; '''
-
         c.execute(rSQL.format(id_maison, date_arriver, identifiant))
         conn.commit()
-
         rSQL = '''SELECT id_paquet FROM PAQUETS  WHERE id_maison = '{}' AND date_arriver = '{}' AND identifiant= '{}'; '''
-
         c.execute(rSQL.format(id_maison, date_arriver, identifiant))
-
         # generate a delivery
         updateLivraison(c.fetchall())
 
 
-def updateCroisement(identifiant, position, x, y):
+def updateCroisement(x, y):
     with connectBase() as conn:
         c = conn.cursor()
-        # Ajouter le Nouvel object
-        rSQL = '''INSERT INTO CROISEMENTS (identifiant, position,x,y)
-                        VALUES ('{}', '{}','{}', '{}') ; '''
-
-        c.execute(rSQL.format(identifiant, position, x, y))
+        rSQL = '''INSERT INTO CROISEMENTS (x,y)
+                        VALUES ('{}', '{}') ; '''
+        c.execute(rSQL.format(x, y))
         conn.commit()
 
 
@@ -212,7 +198,6 @@ def updateMaison(numero, id_croisement):
         c = conn.cursor()
         rSQL = '''INSERT INTO MAISONS (numero,id_croisement)
                         VALUES ('{}','{}') ; '''
-
         c.execute(rSQL.format(numero, id_croisement))
         conn.commit()
 
@@ -221,9 +206,7 @@ def updateLivraison(id_paquet):
     statut = "a livrer"
     with connectBase() as conn:
         c = conn.cursor()
-        # Ajouter le Nouvel object
         rSQL = '''UPDATE LIVRAISONS SET statut = '{}' WHERE id_paquet = '{}'; '''
-
         c.execute(rSQL.format(statut, id_paquet))
         conn.commit()
 
@@ -233,20 +216,15 @@ def updateLivraison(id_paquet):
 def selectRobot(id_robot):
     with connectBase() as conn:
         c = conn.cursor()
-        rSQL = " "
-        if id_robot != '':
-            rSQL = " WHERE id_robot = '" + id_robot + "' "
-
-        rSQL = '''SELECT * from ROBOTS ''' + rSQL
-        c.execute(rSQL)
+        rSQL = '''SELECT * from ROBOTS  WHERE id_robot = '{}' ;'''
+        c.execute(rSQL.format(id_robot))
         return c.fetchone()
 
 
 def selectRobots():
     with connectBase() as conn:
         c = conn.cursor()
-
-        rSQL = '''SELECT * from ROBOTS '''
+        rSQL = '''SELECT * from ROBOTS ;'''
         c.execute(rSQL)
         rows = c.fetchall()
         for row in rows:
@@ -256,63 +234,63 @@ def selectRobots():
 def selectPaquet(id_paquet):
     with connectBase() as conn:
         c = conn.cursor()
-        if id_paquet != '':
-            rSQL = " WHERE identifiant = '" + id_paquet + "' "
+        rSQL = '''SELECT * from PAQUETS  WHERE id_paquet = '{}' ;'''
+        c.execute(rSQL.format(id_paquet))
 
-        rSQL = '''SELECT * from PAQUETS ''' + rSQL
-        c.execute(rSQL)
         return c.fetchone()
 
 
 def selectPaquets():
-    selectPaquets()
     with connectBase() as conn:
-        c = conn.cursor()
-
+        cursor = conn.cursor()
         rSQL = '''SELECT * from PAQUETS '''
-        c.execute(rSQL)
-        rows = c.fetchall()
+        cursor.execute(rSQL)
+        rows = cursor.fetchall()
         for row in rows:
-            yield row
+            yield [["paquet", row], ["maison", selectMaison_by_maison_id(row["id_maison"])]]
 
 
 def selectCroisement(id_croisement):
     with connectBase() as conn:
         c = conn.cursor()
-        if id_croisement != '':
-            rSQL = " WHERE id_croisement = '" + id_croisement + "' "
-
-        rSQL = '''SELECT * from CROISEMENTS ''' + rSQL
-        c.execute(rSQL)
+        rSQL = '''SELECT * from CROISEMENTS  WHERE id_croisement = '{}' ;'''
+        c.execute(rSQL.format(id_croisement))
         return c.fetchone()
 
 
 def selectCroisements():
     with connectBase() as conn:
         c = conn.cursor()
-        rSQL = '''SELECT * from CROISEMENTS '''
+        rSQL = '''SELECT * from CROISEMENTS ;'''
         c.execute(rSQL)
+        rows = c.fetchall()
+        for row in rows:
+            # yield [["croisement",row], ["maison",selectMaison_by_croisement(row["id_croisement"])]]
+            yield [["croisement", row], ["maison", selectMaison_by_croisement(row["id_croisement"])]]
+
+
+def selectMaison_by_croisement(id_croisement):
+    with connectBase() as conn:
+        c = conn.cursor()
+        rSQL = '''SELECT * from MAISONS  WHERE id_croisement = '{}' ;'''
+        c.execute(rSQL.format(id_croisement))
         rows = c.fetchall()
         for row in rows:
             yield row
 
 
-def selectMaison(id_maison):
+def selectMaison_by_maison_id(id_maison: int):
     with connectBase() as conn:
         c = conn.cursor()
-        if id_maison != '':
-            rSQL = " WHERE id_maison = '" + id_maison + "' "
-
-        rSQL = '''SELECT * from MAISONS ''' + rSQL
-        c.execute(rSQL)
+        rSQL = '''SELECT * from MAISONS  WHERE id_maison = '{}' ;'''
+        c.execute(rSQL.format(id_maison))
         return c.fetchone()
 
 
 def selectMaisons():
     with connectBase() as conn:
         c = conn.cursor()
-
-        rSQL = '''SELECT * from MAISONS '''
+        rSQL = '''SELECT * from MAISONS ;'''
         c.execute(rSQL)
         rows = c.fetchall()
         for row in rows:
@@ -322,20 +300,46 @@ def selectMaisons():
 def selectLivraison(id_livraison):
     with connectBase() as conn:
         c = conn.cursor()
-        if id_livraison != '':
-            rSQL = " WHERE identifiant = '" + id_livraison + "' "
-
-        rSQL = '''SELECT * from LIVRAISONS ''' + rSQL
-        c.execute(rSQL)
+        rSQL = '''SELECT * from LIVRAISONS  WHERE id_livraison = '{}' ;'''
+        c.execute(rSQL.format(id_livraison))
         return c.fetchone()
 
 
 def selectLivraisons():
     with connectBase() as conn:
         c = conn.cursor()
-
-        rSQL = '''SELECT * from LIVRAISONS '''
+        rSQL = '''SELECT * from LIVRAISONS ;'''
         c.execute(rSQL)
         rows = c.fetchall()
         for row in rows:
-            yield row
+            paquet = selectPaquet(row["id_paquet"])
+            yield [["livraison", row],
+                   ["paquet", [["paquet", paquet], ["maison", selectMaison_by_maison_id(paquet["id_maison"])]]],
+                   ["robot", selectRobot(row["id_robot"])]]
+
+
+def select_last_Livraisons():
+    with connectBase() as conn:
+        c = conn.cursor()
+        rSQL = '''SELECT * from LIVRAISONS WHERE statut = 'a livrer' ORDER BY id_livraison ASC ;'''
+        c.execute(rSQL)
+        id_paquet = c.fetchone()["id_paquet"]
+
+        rSQL = '''SELECT * from PAQUETS WHERE id_paquet = '{}';'''
+        c.execute(rSQL.format(id_paquet))
+        id_maison = c.fetchone()["id_maison"]
+
+        rSQL = '''SELECT * from MAISONS WHERE id_maison = '{}';'''
+        c.execute(rSQL.format(id_maison))
+        house = c.fetchone()
+        numero_house = house["numero"]
+        id_croisement = house["id_croisement"]
+
+        rSQL = '''SELECT * from CROISEMENTS WHERE id_croisement = '{}';'''
+        c.execute(rSQL.format(id_croisement))
+        croisement = c.fetchone()
+        x = croisement["x"]
+        y = croisement["y"]
+
+        # return ["x", x], ["y", y], ["numero", numero_house]
+        return x, y, numero_house
